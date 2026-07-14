@@ -1,0 +1,59 @@
+OISD-105 Guidelines for Industrial Safety in Steel Plants
+
+SECTION 3: GAS DETECTION AND MONITORING
+
+3.1 Gas Detection Systems: All areas where flammable or toxic gases may accumulate shall be equipped with continuous gas detection systems. Detectors shall be capable of detecting CO, H2S, CH4, and O2 levels.
+
+3.2 Gas Detector Placement: Gas detectors must be installed at all potential gas release points including but not limited to: coke oven batteries, blast furnace areas, gas processing units, and confined spaces. Detectors must be calibrated monthly and tested weekly. Non-functional detectors must be repaired or replaced within 4 hours. A log of all calibration and testing activities shall be maintained.
+
+3.3 Alarm Thresholds: Gas detection alarms shall be set at the following levels:
+- CO: Warning at 25ppm, Critical at 50ppm
+- H2S: Warning at 5ppm, Critical at 10ppm
+- CH4: Warning at 10%LEL, Critical at 25%LEL
+- O2: Warning below 19.5% or above 23.5%, Critical below 16% or above 25%
+
+3.4 Redundancy Requirements: Critical areas shall have redundant gas detectors. In the event of a detector failure, a portable detector must be deployed immediately. No work shall continue in the area without gas detection coverage.
+
+SECTION 4: PERMIT TO WORK SYSTEM
+
+4.1 Permit Types: The following permit types are recognized: Hot Work, Confined Space Entry, Electrical Work, Work at Height, Excavation. Each permit type has specific requirements and must be issued by an authorized person.
+
+4.2 Gas Detection in Confined Spaces: All confined spaces must have continuous gas monitoring before and during entry. Entry is prohibited when gas levels exceed prescribed limits: CO > 25ppm, H2S > 5ppm, CH4 > 10%LEL, O2 outside 19.5-23.5%. Gas monitoring results must be recorded and attached to the permit.
+
+4.3 Simultaneous Operations (SIMOPS): When multiple permits are active in the same zone, a SIMOPS assessment must be conducted. Permits with conflicting activities must be identified and mitigated. No more than three high-risk permits may be active simultaneously in the same zone without additional safety measures.
+
+SECTION 5: EQUIPMENT SAFETY
+
+5.1 Pressure Equipment Safety: All pressure vessels and equipment must be monitored continuously. Pressure readings must not exceed 120% of design pressure. Any deviation beyond this threshold requires immediate shutdown, investigation, and reporting. Pressure relief devices must be tested annually.
+
+5.2 Corrosion Under Insulation (CUI): Insulated piping and equipment must be inspected for corrosion at least once every 12 months. Areas with known corrosion history require inspection every 6 months. Inspection records must include thickness measurements at marked inspection points.
+
+SECTION 6: HOT WORK SAFETY
+
+6.1 Hot Work Definition: Hot work includes welding, cutting, grinding, and any operation producing sparks or heat. All hot work requires a valid Hot Work permit.
+
+6.2 Fire Watch: A dedicated fire watch must be present during all hot work operations. Fire watch personnel must be trained in fire extinguisher use and emergency response. Fire watch must continue for 30 minutes after hot work completion.
+
+6.3 Hot Work Near Flammable Areas: Hot work permits shall not be issued in areas where flammable gas concentration exceeds 10% of LEL. Gas testing must be performed within 30 minutes before and continuously during hot work operations. A fire extinguisher must be readily available at the work site.
+
+SECTION 7: WORK AT HEIGHT
+
+7.1 Scaffold Safety: All scaffolds must be inspected before use. Inspection tags must show the date of inspection and maximum load capacity. Scaffolds must be inspected weekly and after any weather event that may affect stability.
+
+7.2 Fall Protection: Workers at heights above 2 meters must use fall protection equipment. Safety harnesses must be anchored to certified anchor points. Self-retracting lifelines must be inspected before each use.
+
+SECTION 8: CONFINED SPACE SAFETY
+
+8.1 Confined Space Definition: Confined spaces include tanks, vessels, pits, ducts, chimneys, and any enclosed area with limited entry/exit and potential atmospheric hazards.
+
+8.2 Confined Space Ventilation: Mechanical ventilation must be operational before and during confined space entry. Ventilation rate must provide at least 6 air changes per hour. If ventilation fails, all personnel must evacuate immediately and the permit must be suspended. Backup ventilation equipment must be available.
+
+8.3 Rescue Planning: A rescue plan must be prepared before any confined space entry. Rescue equipment including tripod, winch, and full-body harness must be at the entry point. At least one trained rescuer must be present during entry operations.
+
+SECTION 9: EMERGENCY RESPONSE
+
+9.1 Emergency Classification: Emergencies are classified as Level 1 (localized, can be managed by shift team), Level 2 (plant-wide, requires plant emergency response team), or Level 3 (off-site impact, requires external emergency services).
+
+9.2 Evacuation Procedures: Emergency evacuation drills must be conducted quarterly. Evacuation routes must be clearly marked and kept unobstructed. Muster points must be designated and clearly identified. Head count procedures must be established and practiced.
+
+9.3 Communication: Emergency communication systems must be tested weekly. Backup communication methods (e.g., radios, public address system) must be available in case of primary system failure.

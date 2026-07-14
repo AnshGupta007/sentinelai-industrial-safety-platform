@@ -1,0 +1,17 @@
+DGMS MINING SAFETY TECHNICAL CIRCULARS
+=============================================
+
+TECHNICAL CIRCULAR 2/2010: SLOPE STABILITY
+All open pit mines must have continuous slope monitoring.
+Movement >2mm/day triggers evacuation protocol.
+
+TECHNICAL CIRCULAR 3/2016: BLASTING SAFETY
+Blasting exclusion zones based on real-time data.
+
+TECHNICAL CIRCULAR 5/2018: GAS MONITORING
+Continuous gas monitoring in underground workings.
+CO limit: 25ppm. CH4 limit: 0.75% in return airways.
+
+TECHNICAL CIRCULAR 7/2020: EMERGENCY RESPONSE
+All mines must have automated emergency alert system.
+Muster points must be clearly marked and tested monthly.

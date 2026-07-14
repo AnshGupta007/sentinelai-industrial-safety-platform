@@ -1,0 +1,5 @@
+2026-07-10 18:11:25 | sentinelai | INFO | SentinelAI backend starting...
+2026-07-10 18:11:25 | sentinelai | INFO | Database tables initialized
+2026-07-10 18:11:28 | sentinelai | INFO | RAG already populated (78 chunks)
+2026-07-10 18:11:28 | simulator | INFO | Simulator initialized with demo scenario
+2026-07-10 18:11:28 | redis_client | WARNING | Redis unavailable, using in-memory queue: module 'redis' has no attribute 'from_url'

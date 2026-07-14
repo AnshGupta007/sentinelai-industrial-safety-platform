@@ -1,0 +1,31 @@
+DGMS Technical Circulars and Mining Safety Regulations
+
+CIRCULAR 2/2010: SLOPE STABILITY MONITORING
+All open pit mines and storage areas with slopes exceeding 10 meters in height must have continuous slope stability monitoring. Inclinometers and piezometers shall be installed at locations identified in the slope stability analysis. Movement exceeding 2mm per day requires immediate evacuation of the affected area and geotechnical assessment. Daily visual inspections of slopes shall be conducted by competent persons. Monitoring data shall be reviewed weekly by a qualified geotechnical engineer.
+
+CIRCULAR 3/2016: BLASTING SAFETY AND EXCLUSION ZONES
+Blasting operations shall only be conducted under the supervision of a competent blaster holding a valid certificate of competency. Exclusion zones shall be established based on risk assessment, with minimum distances as follows: 500 meters for general blasting, 300 meters for controlled blasting. All personnel must be evacuated from the exclusion zone before blasting. Warning signals shall be given at 15 minutes, 5 minutes, and immediately before blasting. Post-blast inspection shall be conducted before allowing personnel to return.
+
+CIRCULAR 4/2018: MONITORING OF TOXIC GASES IN MINES
+Continuous monitoring of toxic gases including CO, NO2, SO2, and H2S shall be carried out in all underground and confined mining areas. Portable gas detectors shall be provided to all personnel working in potentially hazardous atmospheres. Gas monitoring records shall be maintained and reviewed daily. When gas levels exceed threshold limits, all personnel shall be withdrawn immediately.
+
+CIRCULAR 5/2019: EMERGENCY RESPONSE PLAN FOR MINES
+Every mine shall have an approved emergency response plan. The plan shall include evacuation procedures, communication protocols, rescue equipment inventory, and contact details of emergency services. Emergency drills shall be conducted at least once every quarter. A mine rescue team shall be maintained with trained personnel. The emergency response plan shall be reviewed and updated annually.
+
+CIRCULAR 6/2020: USE OF PERSONAL PROTECTIVE EQUIPMENT
+All personnel in mining operations shall be provided with and shall use appropriate personal protective equipment including safety helmets, safety shoes, high-visibility clothing, and where required, respiratory protective equipment. The mine manager shall ensure that PPE is maintained in good condition and replaced when damaged or expired. A PPE compliance monitoring system shall be implemented.
+
+CIRCULAR 7/2020: ELECTRICAL SAFETY IN MINES AND INDUSTRIAL AREAS
+All electrical installations in mines and industrial areas shall comply with IS:7244 and IEEE standards. Electrical equipment in potentially explosive atmospheres shall be of flameproof construction. Cables shall be properly insulated and protected against mechanical damage. Earth leakage protection shall be provided for all electrical circuits. Testing and maintenance records shall be maintained.
+
+CIRCULAR 8/2021: CONFINED SPACE ENTRY PROCEDURES
+Entry into confined spaces such as bins, silos, tanks, and hoppers shall be governed by a formal permit-to-work system. Atmospheric testing for oxygen content, flammable gases, and toxic gases shall be conducted before entry and continuously during entry. A safety attendant shall be stationed at the entry point at all times. Rescue equipment shall be readily available. Communication between the entrant and attendant shall be maintained at all times.
+
+CIRCULAR 9/2021: TRANSPORTATION SAFETY IN MINES
+All transportation equipment including dumpers, dozers, and loaders shall be maintained in safe operating condition. Speed limits shall be enforced. Drivers shall be trained and licensed. Regular maintenance schedules shall be followed. Safety devices including reverse alarms, seat belts, and roll-over protection systems shall be functional on all equipment.
+
+DGMS STANDARD OPERATING PROCEDURE: INCIDENT REPORTING
+All incidents including fatalities, serious injuries, dangerous occurrences, and environmental releases shall be reported to DGMS within 24 hours. An incident investigation shall be conducted by a competent person. Root cause analysis shall be performed. Corrective and preventive actions shall be documented and implemented. Incident records shall be maintained for a minimum of 5 years.
+
+DGMS GUIDELINE: RISK ASSESSMENT AND MANAGEMENT
+All mining and industrial operations shall conduct formal risk assessments for all activities. Risk assessments shall identify hazards, evaluate risks, and determine control measures. High-risk activities require written risk assessments approved by the site manager. Risk assessments shall be reviewed annually or when significant changes occur.

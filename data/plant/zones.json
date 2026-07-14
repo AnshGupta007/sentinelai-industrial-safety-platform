@@ -1,0 +1,8 @@
+[
+  {"zoneId": "ZONE_A", "name": "Coke Oven Battery", "riskLevel": "HIGH", "x": 5, "y": 5, "width": 44, "height": 44},
+  {"zoneId": "ZONE_B", "name": "Blast Furnace Area", "riskLevel": "HIGH", "x": 51, "y": 5, "width": 44, "height": 44},
+  {"zoneId": "ZONE_C", "name": "Gas Processing Unit", "riskLevel": "MEDIUM", "x": 28, "y": 28, "width": 44, "height": 28},
+  {"zoneId": "ZONE_D", "name": "Control Room", "riskLevel": "LOW", "x": 28, "y": 60, "width": 44, "height": 20},
+  {"zoneId": "ZONE_E", "name": "Maintenance Workshop", "riskLevel": "MEDIUM", "x": 5, "y": 55, "width": 20, "height": 25},
+  {"zoneId": "ZONE_F", "name": "Raw Material Storage", "riskLevel": "LOW", "x": 75, "y": 55, "width": 20, "height": 25}
+]

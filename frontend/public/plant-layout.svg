@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <rect width="800" height="600" fill="#060B18"/>
+  <rect x="50" y="50" width="300" height="200" fill="rgba(16,185,129,0.08)" stroke="#10B981" strokeWidth="1" rx="4"/>
+  <text x="200" y="155" textAnchor="middle" fill="#10B981" fontSize="14" fontWeight="bold">ZONE A — SAFE</text>
+  <rect x="450" y="50" width="300" height="200" fill="rgba(245,158,11,0.08)" stroke="#F59E0B" strokeWidth="1" rx="4"/>
+  <text x="600" y="155" textAnchor="middle" fill="#F59E0B" fontSize="14" fontWeight="bold">ZONE B — CAUTION</text>
+  <rect x="50" y="350" width="300" height="200" fill="rgba(249,115,22,0.08)" stroke="#F97316" strokeWidth="1" rx="4"/>
+  <text x="200" y="455" textAnchor="middle" fill="#F97316" fontSize="14" fontWeight="bold">ZONE C — HIGH</text>
+  <rect x="450" y="350" width="300" height="200" fill="rgba(239,68,68,0.08)" stroke="#EF4444" strokeWidth="1" rx="4"/>
+  <text x="600" y="455" textAnchor="middle" fill="#EF4444" fontSize="14" fontWeight="bold">ZONE D — CRITICAL</text>
+  <line x1="350" y1="150" x2="450" y2="150" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="5 3"/>
+  <line x1="200" y1="250" x2="200" y2="350" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="5 3"/>
+  <line x1="600" y1="250" x2="600" y2="350" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="5 3"/>
+  <line x1="350" y1="450" x2="450" y2="450" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeDasharray="5 3"/>
+  <circle cx="700" cy="500" r="20" fill="rgba(16,185,129,0.15)" stroke="#10B981" strokeWidth="1"/>
+  <text x="700" y="505" textAnchor="middle" fill="#10B981" fontSize="10" fontWeight="bold">MP</text>
+</svg>

@@ -1,0 +1,12 @@
+2026-07-10 18:25:59 | sentinelai | INFO | SentinelAI backend starting...
+2026-07-10 18:25:59 | sentinelai | INFO | Database tables initialized
+2026-07-10 18:26:00 | sentinelai | INFO | RAG already populated (78 chunks)
+2026-07-10 18:26:00 | simulator | INFO | Simulator initialized with demo scenario
+2026-07-10 18:26:00 | redis_client | WARNING | Redis unavailable, using in-memory queue: module 'redis' has no attribute 'from_url'
+INFO:     127.0.0.1:56230 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56235 - "GET /api/risk/compound/ZONE_A HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56236 - "GET /api/permits/intelligence HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56237 - "POST /api/incidents/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56238 - "GET /api/emergency HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36508 - "GET /api/risk/compound-all HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36509 - "GET /api/incidents/patterns HTTP/1.1" 200 OK

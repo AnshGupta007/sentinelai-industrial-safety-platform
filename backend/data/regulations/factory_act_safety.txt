@@ -1,0 +1,34 @@
+Factory Act 1948 - Safety Provisions for Industrial Workers
+
+SECTION 21: FENCING OF MACHINERY
+In every factory, every moving part of a prime mover and every flywheel connected to a prime mover shall be securely fenced. The fencing shall be of substantial construction and shall be maintained in good condition. No person shall be required to work on or near machinery in motion unless it is securely fenced. Where fencing is removed for maintenance or repair, a written permit must be issued and the area clearly marked with warning signs.
+
+SECTION 29: LIFTING MACHINES AND TACKLE
+All lifting machines and tackle shall be of good mechanical construction, sound material, and adequate strength. They shall be tested and examined by a competent person at least once in every period of 12 months. A register of all tests and examinations shall be maintained. The safe working load shall be plainly marked on every lifting machine and tackle. No lifting machine or tackle shall be loaded beyond its safe working load except under specific conditions approved by the Chief Inspector.
+
+SECTION 31: SAFE ACCESS AND EGRESS
+All floors, steps, stairs, passages, and gangways shall be of sound construction and properly maintained. They shall be kept free from obstructions and slippery substances. Safe means of access shall be provided to every place where any person has to work. Handrails shall be provided for all staircases. Openings in floors shall be securely covered or fenced.
+
+SECTION 32: PRECAUTIONS AGAINST ELECTRICAL HAZARDS
+All electrical installations and equipment shall be of adequate rating and properly maintained. Live electrical conductors shall be insulated or otherwise protected. Lockout-Tagout procedures must be followed before any maintenance or repair work on electrical equipment. Only authorized and competent persons shall carry out electrical work. A register of all electrical installations and tests shall be maintained.
+
+SECTION 34: PROTECTION FROM HOT SUBSTANCES AND EXPLOSIONS
+Effective measures shall be taken to protect workers from burns and scalds caused by hot substances, processes, or equipment. Barriers, screens, or protective clothing must be provided. Where there is risk of explosion due to gas, vapor, or dust, all practicable measures shall be taken to prevent the accumulation of explosive concentrations and to prevent ignition sources.
+
+SECTION 35: PRECAUTIONS REGARDING DUST AND FUMES
+Where any manufacturing process produces dust, fume, or other impurity of such a character and to such extent as to be likely to be injurious to workers, effective measures shall be taken to prevent its accumulation and to protect workers from inhalation. Exhaust ventilation systems shall be provided and maintained. Personal protective equipment shall be provided where engineering controls are insufficient.
+
+SECTION 36: PRECAUTIONS AGAINST DANGEROUS FUMES IN CONFINED SPACES
+No person shall be required to enter any chamber, tank, vat, pit, pipe, flue, or similar confined space where dangerous fumes are likely to be present. Before any person enters a confined space, all practicable measures shall be taken to remove any fume and to prevent ingress of fumes. A competent person shall test the atmosphere to ensure it is safe for entry. Where the risk of fume accumulation remains, breathing apparatus shall be provided.
+
+SECTION 36A: EXPLOSIVE OR INFLAMMABLE GAS, FUME OR DUST
+Where any work is to be carried out in any place where explosive or inflammable gas, fume, or dust is present or likely to be present, adequate measures shall be taken to prevent fire or explosion. All electrical equipment in such areas shall be of flameproof construction. Smoking and naked lights shall be prohibited in such areas. Warning signs shall be prominently displayed.
+
+SECTION 38: SAFETY OF BUILDINGS AND STRUCTURES
+All buildings and structures in a factory shall be maintained in good repair and sound condition. Regular structural inspections shall be carried out. Any structural defect that may endanger safety shall be immediately reported and rectified. Load-bearing walls, columns, and roofs shall be periodically examined by a competent person.
+
+SECTION 40: DUTIES OF OCCUPIER
+The occupier of every factory shall ensure that all workers receive adequate safety training. A safety committee shall be constituted where 250 or more workers are employed. The occupier shall ensure that all safety equipment and appliances are maintained in good condition. An accident register shall be maintained and all accidents causing death or serious injury shall be reported to the Inspector.
+
+SECTION 41: NOTICE OF ACCIDENTS
+Where an accident occurs in a factory causing death or serious injury, notice shall be sent to the Inspector within 24 hours. The notice shall include details of the accident, the nature of the injury, and the circumstances. A register of all accidents shall be maintained and made available for inspection.

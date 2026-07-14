@@ -1,0 +1,34 @@
+OISD-105: INDUSTRIAL SAFETY GUIDELINES
+===========================================
+
+SECTION 3: GAS DETECTION SYSTEMS
+3.1 All gas detectors must be installed at potential release points.
+3.2 Detectors must be calibrated monthly and tested weekly.
+3.3 Non-functional detectors must be replaced within 4 hours.
+
+SECTION 4: GAS EXPOSURE LIMITS
+4.1 CO: 25ppm (8-hour TWA), 50ppm (short-term)
+4.2 H2S: 5ppm (8-hour TWA), 10ppm (short-term)
+4.3 CH4: 10%LEL (warning), 25%LEL (critical)
+
+SECTION 5: EQUIPMENT SAFETY
+5.1 Pressure vessels must be monitored continuously.
+5.2 Corrosion inspection every 6 months minimum.
+
+SECTION 6: HOT WORK PERMITS
+6.1 Gas testing within 30 minutes before hot work.
+6.2 Continuous monitoring during hot work operations.
+6.3 No hot work if flammable gas exceeds 10% LEL.
+
+SECTION 7: LIFTING EQUIPMENT
+7.1 All cranes must be load tested annually.
+7.2 Daily pre-use inspection mandatory.
+
+SECTION 8: CONFINED SPACE ENTRY
+8.1 Continuous gas monitoring required.
+8.2 Mechanical ventilation must be operational.
+8.3 Rescue plan must be in place before entry.
+
+SECTION 9: WORK AT HEIGHT
+9.1 Fall protection equipment mandatory above 2m.
+9.2 Scaffolds inspected weekly.
