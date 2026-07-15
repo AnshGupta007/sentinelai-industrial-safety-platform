@@ -1,38 +1,34 @@
 import os
 from typing import List, Optional
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+class SentenceTransformerEmbeddings:
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+        from sentence_transformers import SentenceTransformer
+        self._model = SentenceTransformer(model_name)
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return self._model.encode(texts).tolist()
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._model.encode(text).tolist()
 
 class EmbeddingService:
     def __init__(self):
-        self.client = None
+        self._local_embeddings = None
         self._langchain_embeddings = None
-        if OPENAI_API_KEY:
-            try:
-                from openai import OpenAI
-                self.client = OpenAI(api_key=OPENAI_API_KEY)
-            except Exception:
-                pass
-            try:
-                from langchain_openai import OpenAIEmbeddings
-                self._langchain_embeddings = OpenAIEmbeddings(
-                    model=EMBEDDING_MODEL,
-                    openai_api_key=OPENAI_API_KEY,
-                )
-            except ImportError:
-                pass
-            except Exception:
-                pass
+        try:
+            self._langchain_embeddings = SentenceTransformerEmbeddings()
+            self._local_embeddings = self._langchain_embeddings
+        except Exception:
+            pass
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
-        if self.client:
+        if self._local_embeddings:
             try:
-                response = self.client.embeddings.create(input=texts, model=EMBEDDING_MODEL)
-                return [r.embedding for r in response.data]
+                return self._local_embeddings.embed_documents(texts)
             except Exception:
                 pass
-        return [[0.0] * 1536 for _ in texts]
+        return [[0.0] * 384 for _ in texts]
 
     def embed_query(self, text: str) -> List[float]:
         return self.embed_texts([text])[0]

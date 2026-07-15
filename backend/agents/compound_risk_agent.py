@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, TypedDict, Any
 from langgraph.graph import StateGraph, END
 from data.simulator import calculate_risk, ZONE_CONFIG, get_current_sensors, get_permits, get_workers
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 class AgentState(TypedDict):
     zone_id: str
@@ -126,11 +126,11 @@ def recommendation_agent(state: AgentState) -> dict:
     sensor = state.get("sensor_analysis", {})
     permit = state.get("permit_analysis", {})
 
-    if OPENAI_API_KEY:
+    if GROQ_API_KEY:
         try:
-            from langchain_openai import ChatOpenAI
+            from langchain_groq import ChatGroq
             from langchain_core.prompts import ChatPromptTemplate
-            llm = ChatOpenAI(model=os.getenv("OPENAI_MODEL", "gpt-4o") or "gpt-4o", temperature=0.2, openai_api_key=OPENAI_API_KEY)
+            llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile") or "llama-3.3-70b-versatile", temperature=0.2, groq_api_key=GROQ_API_KEY)
             prompt = ChatPromptTemplate.from_messages([
                 ("system", "You are a senior industrial safety advisor. Generate 3-5 concise, actionable recommendations for a plant safety team based on the risk assessment data provided. Be specific about what action to take, who should take it, and why."),
                 ("human", "Zone: {zone_id}\nRisk Level: {risk_level}\nRisk Score: {risk_score}\nTriggered Rules: {rules}\nSensor Anomalies: {anomaly_count} of {sensor_count}\nPermit Conflicts: {conflict_count}\nWorkers in Danger: {workers_in_danger}\n\nGenerate specific, actionable safety recommendations:"),

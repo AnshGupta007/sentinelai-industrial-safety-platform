@@ -8,8 +8,8 @@ from utils.logger import setup_logger
 logger = setup_logger("copilot")
 router = APIRouter()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 SYSTEM_PROMPT = """You are SentinelAI Copilot, an expert industrial safety AI assistant for steel plants. You have access to real-time plant data.
 
@@ -75,32 +75,29 @@ def generate_llm_response(message: str) -> dict:
     prompt = SYSTEM_PROMPT.format(context=context)
 
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        resp = client.chat.completions.create(
-            model=OPENAI_MODEL,
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": message},
-            ],
-            temperature=0.3,
-            max_tokens=1024,
-            response_format={"type": "json_object"},
-        )
-        content = resp.choices[0].message.content.strip()
-        result = json.loads(content)
+        from langchain_groq import ChatGroq
+        from langchain_core.prompts import ChatPromptTemplate
+        from langchain_core.output_parsers import StrOutputParser
+        llm = ChatGroq(model=GROQ_MODEL, groq_api_key=GROQ_API_KEY, temperature=0.3, max_tokens=1024)
+        chat_prompt = ChatPromptTemplate.from_messages([
+            ("system", prompt),
+            ("human", "{message}"),
+        ])
+        chain = chat_prompt | llm | StrOutputParser()
+        content = chain.invoke({"message": message})
+        result = json.loads(content.strip())
         return {
             "response": result.get("response", ""),
-            "sources": result.get("sources", ["GPT-4o"]),
+            "sources": result.get("sources", ["Groq (Llama 3)"]),
             "confidence": min(1.0, max(0.0, result.get("confidence", 0.85))),
         }
     except Exception as e:
-        logger.warning(f"OpenAI call failed: {e}")
+        logger.warning(f"Groq call failed: {e}")
         return None
 
 
 def generate_response(message: str) -> dict:
-    if OPENAI_API_KEY:
+    if GROQ_API_KEY:
         result = generate_llm_response(message)
         if result:
             return result
