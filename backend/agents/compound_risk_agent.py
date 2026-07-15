@@ -128,27 +128,28 @@ def recommendation_agent(state: AgentState) -> dict:
 
     if GROQ_API_KEY:
         try:
-            from langchain_groq import ChatGroq
-            from langchain_core.prompts import ChatPromptTemplate
-            llm = ChatGroq(model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile") or "llama-3.3-70b-versatile", temperature=0.2, groq_api_key=GROQ_API_KEY)
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", "You are a senior industrial safety advisor. Generate 3-5 concise, actionable recommendations for a plant safety team based on the risk assessment data provided. Be specific about what action to take, who should take it, and why."),
-                ("human", "Zone: {zone_id}\nRisk Level: {risk_level}\nRisk Score: {risk_score}\nTriggered Rules: {rules}\nSensor Anomalies: {anomaly_count} of {sensor_count}\nPermit Conflicts: {conflict_count}\nWorkers in Danger: {workers_in_danger}\n\nGenerate specific, actionable safety recommendations:"),
-            ])
-            messages = prompt.format_messages(
-                zone_id=zone_id,
-                risk_level=risk_level,
-                risk_score=risk_score,
-                rules="; ".join(f"{r.get('ruleId','')}: {r.get('description','')}" for r in rules),
-                anomaly_count=sensor.get("anomaly_count", 0),
-                sensor_count=sensor.get("sensor_count", 0),
-                conflict_count=permit.get("conflict_count", 0),
-                workers_in_danger=state.get("worker_analysis", {}).get("workers_in_danger", 0),
+            from groq import Groq
+            client = Groq(api_key=GROQ_API_KEY)
+            system_msg = "You are a senior industrial safety advisor. Generate 3-5 concise, actionable recommendations for a plant safety team based on the risk assessment data provided. Be specific about what action to take, who should take it, and why. Return your response as a JSON array of strings with key 'recommendations'."
+            human_msg = (
+                f"Zone: {zone_id}\nRisk Level: {risk_level}\nRisk Score: {risk_score}\n"
+                f"Triggered Rules: {'; '.join(f'{r.get('ruleId','')}: {r.get('description','')}' for r in rules)}\n"
+                f"Sensor Anomalies: {sensor.get('anomaly_count', 0)} of {sensor.get('sensor_count', 0)}\n"
+                f"Permit Conflicts: {permit.get('conflict_count', 0)}\n"
+                f"Workers in Danger: {state.get('worker_analysis', {}).get('workers_in_danger', 0)}\n\n"
+                "Generate specific, actionable safety recommendations:"
             )
-            response = llm.invoke(messages)
-            recommendations = [line.strip().lstrip("- ") for line in response.content.split("\n") if line.strip() and not line.strip().startswith("#")]
+            resp = client.chat.completions.create(
+                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+                messages=[{"role": "system", "content": system_msg}, {"role": "user", "content": human_msg}],
+                temperature=0.2,
+                max_tokens=1024,
+            )
+            import json
+            result = json.loads(resp.choices[0].message.content.strip())
+            recommendations = result.get("recommendations", [])
             return {"recommendations": recommendations[:5]}
-        except (ImportError, Exception):
+        except Exception:
             pass
 
     recommendations = []

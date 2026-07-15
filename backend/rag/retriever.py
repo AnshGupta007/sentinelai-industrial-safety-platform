@@ -143,7 +143,6 @@ class RAGRetriever:
     def get_qa_chain(self):
         try:
             from langchain.chains import RetrievalQA
-            from langchain_groq import ChatGroq
             from langchain.prompts import PromptTemplate
             lc_retriever = self.as_langchain_retriever(search_kwargs={"k": 8})
             if not lc_retriever:
@@ -151,11 +150,23 @@ class RAGRetriever:
             api_key = os.getenv("GROQ_API_KEY", "")
             if not api_key:
                 return None
-            llm = ChatGroq(
-                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
-                temperature=0.1,
-                groq_api_key=api_key,
-            )
+            from langchain.llms.base import LLM
+            from groq import Groq
+            class GroqLLM(LLM):
+                model: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+                temperature: float = 0.1
+                max_tokens: int = 1024
+                _client: Groq = Groq(api_key=api_key)
+                @property
+                def _llm_type(self) -> str:
+                    return "groq"
+                def _call(self, prompt: str, stop=None, **kwargs) -> str:
+                    resp = self._client.chat.completions.create(
+                        model=self.model, messages=[{"role": "user", "content": prompt}],
+                        temperature=self.temperature, max_tokens=self.max_tokens,
+                    )
+                    return resp.choices[0].message.content or ""
+            llm = GroqLLM()
             template = """You are SentinelAI's industrial safety RAG assistant. Use the context to answer questions about incidents, regulations, and safety.
 
 Context:

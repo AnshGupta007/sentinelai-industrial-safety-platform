@@ -75,17 +75,19 @@ def generate_llm_response(message: str) -> dict:
     prompt = SYSTEM_PROMPT.format(context=context)
 
     try:
-        from langchain_groq import ChatGroq
-        from langchain_core.prompts import ChatPromptTemplate
-        from langchain_core.output_parsers import StrOutputParser
-        llm = ChatGroq(model=GROQ_MODEL, groq_api_key=GROQ_API_KEY, temperature=0.3, max_tokens=1024)
-        chat_prompt = ChatPromptTemplate.from_messages([
-            ("system", prompt),
-            ("human", "{message}"),
-        ])
-        chain = chat_prompt | llm | StrOutputParser()
-        content = chain.invoke({"message": message})
-        result = json.loads(content.strip())
+        from groq import Groq
+        client = Groq(api_key=GROQ_API_KEY)
+        resp = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": message + "\n\nRespond ONLY with valid JSON matching the format specified in the system prompt."},
+            ],
+            temperature=0.3,
+            max_tokens=1024,
+        )
+        content = resp.choices[0].message.content.strip()
+        result = json.loads(content)
         return {
             "response": result.get("response", ""),
             "sources": result.get("sources", ["Groq (Llama 3)"]),
