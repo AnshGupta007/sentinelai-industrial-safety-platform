@@ -70,6 +70,27 @@ def build_context() -> str:
     }, default=str)
 
 
+def extract_json(text: str) -> dict:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    import re
+    m = re.search(r"\{[^{}]*\}", text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group())
+        except json.JSONDecodeError:
+            pass
+    m2 = re.search(r"```(?:json)?\s*\n(.+?)\n```", text, re.DOTALL)
+    if m2:
+        try:
+            return json.loads(m2.group(1))
+        except json.JSONDecodeError:
+            pass
+    return None
+
+
 def generate_llm_response(message: str) -> dict:
     context = build_context()
     prompt = SYSTEM_PROMPT.format(context=context)
@@ -87,7 +108,10 @@ def generate_llm_response(message: str) -> dict:
             max_tokens=1024,
         )
         content = resp.choices[0].message.content.strip()
-        result = json.loads(content)
+        result = extract_json(content)
+        if not result:
+            logger.warning(f"Groq returned unparseable response: {content[:200]}")
+            return None
         return {
             "response": result.get("response", ""),
             "sources": result.get("sources", ["Groq (Llama 3)"]),
