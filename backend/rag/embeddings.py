@@ -3,31 +3,29 @@ from typing import List
 
 logger = logging.getLogger("embeddings")
 
-class ChromaEmbeddingsWrapper:
-    def __init__(self):
-        import chromadb.utils.embedding_functions as ef
-        self._fn = ef.DefaultEmbeddingFunction()
+class SklearnEmbeddingsWrapper:
+    def __init__(self, dim: int = 384):
+        from sklearn.feature_extraction.text import HashingVectorizer
+        self._vec = HashingVectorizer(n_features=dim, norm="l2")
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        return self._fn(texts)
+        return self._vec.transform(texts).toarray().tolist()
 
     def embed_query(self, text: str) -> List[float]:
-        return self._fn([text])[0]
+        return self._vec.transform([text]).toarray()[0].tolist()
 
 class EmbeddingService:
     def __init__(self):
-        self._langchain_embeddings = None
-        self._local_fn = None
+        self._wrapped = None
         try:
-            self._local_fn = ChromaEmbeddingsWrapper()
-            self._langchain_embeddings = self._local_fn
+            self._wrapped = SklearnEmbeddingsWrapper()
         except Exception as e:
             logger.warning(f"Embeddings init failed: {e}")
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
-        if self._local_fn:
+        if self._wrapped:
             try:
-                return self._local_fn.embed_documents(texts)
+                return self._wrapped.embed_documents(texts)
             except Exception as e:
                 logger.warning(f"Embedding failed: {e}")
         return [[0.0] * 384 for _ in texts]
@@ -36,7 +34,7 @@ class EmbeddingService:
         return self.embed_texts([text])[0]
 
     def get_langchain_embeddings(self):
-        return self._langchain_embeddings
+        return self._wrapped
 
     def is_available(self) -> bool:
-        return self._langchain_embeddings is not None
+        return self._wrapped is not None
