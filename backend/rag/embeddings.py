@@ -1,15 +1,25 @@
 import os
+import logging
 from typing import List, Optional
+
+logger = logging.getLogger("embeddings")
 
 class SentenceTransformerEmbeddings:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        from sentence_transformers import SentenceTransformer
-        self._model = SentenceTransformer(model_name)
+        self._model = None
+        self._model_name = model_name
+
+    def _ensure_model(self):
+        if self._model is None:
+            from sentence_transformers import SentenceTransformer
+            self._model = SentenceTransformer(self._model_name)
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        self._ensure_model()
         return self._model.encode(texts).tolist()
 
     def embed_query(self, text: str) -> List[float]:
+        self._ensure_model()
         return self._model.encode(text).tolist()
 
 class EmbeddingService:
@@ -17,17 +27,17 @@ class EmbeddingService:
         self._local_embeddings = None
         self._langchain_embeddings = None
         try:
-            self._langchain_embeddings = SentenceTransformerEmbeddings()
-            self._local_embeddings = self._langchain_embeddings
-        except Exception:
-            pass
+            self._local_embeddings = SentenceTransformerEmbeddings()
+            self._langchain_embeddings = self._local_embeddings
+        except Exception as e:
+            logger.warning(f"Embeddings init failed: {e}")
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
         if self._local_embeddings:
             try:
                 return self._local_embeddings.embed_documents(texts)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Embedding failed: {e}")
         return [[0.0] * 384 for _ in texts]
 
     def embed_query(self, text: str) -> List[float]:
@@ -37,4 +47,10 @@ class EmbeddingService:
         return self._langchain_embeddings
 
     def is_available(self) -> bool:
-        return self._langchain_embeddings is not None
+        if not self._langchain_embeddings:
+            return False
+        try:
+            self._langchain_embeddings._ensure_model()
+            return True
+        except Exception:
+            return False
