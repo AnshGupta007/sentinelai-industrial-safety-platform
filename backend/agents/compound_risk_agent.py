@@ -131,9 +131,10 @@ def recommendation_agent(state: AgentState) -> dict:
             from groq import Groq
             client = Groq(api_key=GROQ_API_KEY)
             system_msg = "You are a senior industrial safety advisor. Generate 3-5 concise, actionable recommendations for a plant safety team based on the risk assessment data provided. Be specific about what action to take, who should take it, and why. Return your response as a JSON array of strings with key 'recommendations'."
+            rule_str = "; ".join(f"{r.get('ruleId','')}: {r.get('description','')}" for r in rules)
             human_msg = (
                 f"Zone: {zone_id}\nRisk Level: {risk_level}\nRisk Score: {risk_score}\n"
-                f"Triggered Rules: {'; '.join(f'{r.get('ruleId','')}: {r.get('description','')}' for r in rules)}\n"
+                f"Triggered Rules: {rule_str}\n"
                 f"Sensor Anomalies: {sensor.get('anomaly_count', 0)} of {sensor.get('sensor_count', 0)}\n"
                 f"Permit Conflicts: {permit.get('conflict_count', 0)}\n"
                 f"Workers in Danger: {state.get('worker_analysis', {}).get('workers_in_danger', 0)}\n\n"
