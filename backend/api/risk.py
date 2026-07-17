@@ -54,3 +54,12 @@ async def risk_compound_agent(zone_id: str):
 async def risk_zone(zone_id: str):
     risk = get_zone_risk(zone_id)
     return {"data": risk, "timestamp": __import__("datetime").datetime.now().isoformat()}
+
+@router.get("/predictions/{zone_id}")
+async def risk_predictions(zone_id: str):
+    try:
+        from models.predictive_risk import get_predictions
+        predictions = get_predictions(zone_id)
+        return {"data": predictions, "timestamp": __import__("datetime").datetime.now().isoformat()}
+    except Exception as e:
+        return {"data": {"zoneId": zone_id, "predictions": {}, "forecastedRisk30": 0, "forecastedRisk60": 0, "forecastedRisk90": 0, "currentRisk": 0, "horizon": "90min", "error": str(e)}, "timestamp": __import__("datetime").datetime.now().isoformat()}

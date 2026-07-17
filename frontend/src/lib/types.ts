@@ -195,3 +195,123 @@ export interface ApiResponse<T> {
   data: T;
   timestamp: string;
 }
+
+// ── Prediction Types ──
+export interface GasPrediction {
+  predicted: number;
+  interval: {
+    lower: number;
+    upper: number;
+    confidence: number;
+  };
+}
+
+export interface ZonePredictions {
+  zoneId: string;
+  predictions: Record<string, Record<string, GasPrediction>>;
+  forecastedRisk30: number;
+  forecastedRisk60: number;
+  forecastedRisk90: number;
+  currentRisk: number;
+  horizon: string;
+  timestamp: string;
+}
+
+export interface RiskPredictionPoint {
+  time: string;
+  score: number;
+  predicted?: boolean;
+  lower?: number;
+  upper?: number;
+}
+
+// ── What-If Types ──
+export interface WhatIfScenario {
+  ventilationOffline?: boolean;
+  hotWorkPermitActive?: boolean;
+  shiftChangeover?: boolean;
+  gasLeakZoneA?: boolean;
+  maintenanceInZoneB?: boolean;
+}
+
+export interface WhatIfOverrides {
+  CH4?: number;
+  CO?: number;
+  H2S?: number;
+  O2?: number;
+}
+
+export interface WhatIfRequest {
+  zoneId: string;
+  overrides: WhatIfOverrides;
+  scenarioFlags: WhatIfScenario;
+}
+
+export interface WhatIfResult {
+  zoneId: string;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  triggeredRules: Array<{
+    ruleId: string;
+    description: string;
+    contribution: number;
+    severity: string;
+    scenario: boolean;
+  }>;
+  appliedOverrides: WhatIfOverrides;
+  scenarioFlags: WhatIfScenario;
+  sensorReadings: Record<string, number>;
+  timestamp: string;
+}
+
+// ── PPE / CCTV Types ──
+export interface PpeCamera {
+  cameraId: string;
+  zoneId: string;
+  label: string;
+}
+
+export interface PpeViolation {
+  violationId: string;
+  workerId: string;
+  workerName: string;
+  zoneId: string;
+  permitType: string;
+  permitId: string;
+  missingItems: string[];
+  detectedAt: string;
+  acknowledged: boolean;
+}
+
+export interface PpeDetectionEvent {
+  eventId: string;
+  cameraId: string;
+  zoneId: string;
+  workerId: string;
+  detected: Record<string, boolean>;
+  timestamp: string;
+}
+
+export interface PpeStats {
+  totalViolations: number;
+  activeViolations: number;
+  byZone: Record<string, number>;
+  byMissingItem: Record<string, number>;
+}
+
+// ── Notification Types ──
+export interface Notification {
+  notificationId: string;
+  channel: string;
+  recipient: string;
+  message: string;
+  templateType: string;
+  timestamp: string;
+  delivered: boolean;
+}
+
+export interface NotificationStats {
+  total: number;
+  byChannel: Record<string, number>;
+  byType: Record<string, number>;
+}

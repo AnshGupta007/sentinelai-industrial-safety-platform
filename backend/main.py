@@ -12,6 +12,9 @@ from api.incidents import router as incidents_router
 from api.copilot import router as copilot_router
 from api.workers import router as workers_router
 from api.emergency import router as emergency_router
+from api.knowledge_graph import router as knowledge_graph_router
+from api.simulator_api import router as simulator_router
+from api.cv import router as cv_router
 from websocket.manager import ConnectionManager, broadcast_sensor_update, broadcast_risk_update, broadcast_alert, broadcast_permit_flagged, broadcast_emergency
 from data.simulator import simulate_loop
 from utils.logger import setup_logger
@@ -43,6 +46,11 @@ async def lifespan(app: FastAPI):
             logger.warning("ChromaDB unavailable — RAG disabled")
     except Exception as e:
         logger.warning(f"RAG init skipped: {e}")
+    try:
+        from knowledge_graph.graph import knowledge_graph
+        knowledge_graph.build()
+    except Exception as e:
+        logger.warning(f"Knowledge graph init skipped: {e}")
     yield
     task.cancel()
     logger.info("SentinelAI backend shutting down...")
@@ -65,6 +73,9 @@ app.include_router(incidents_router, prefix="/api/incidents", tags=["incidents"]
 app.include_router(copilot_router, prefix="/api/copilot", tags=["copilot"])
 app.include_router(workers_router, prefix="/api/workers", tags=["workers"])
 app.include_router(emergency_router, prefix="/api/emergency", tags=["emergency"])
+app.include_router(knowledge_graph_router, prefix="/api/knowledge-graph", tags=["knowledge-graph"])
+app.include_router(simulator_router, prefix="/api/simulator", tags=["simulator"])
+app.include_router(cv_router, prefix="/api/cv", tags=["cv"])
 
 @app.get("/api/health")
 async def health():

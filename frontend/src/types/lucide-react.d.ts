@@ -19,4 +19,17 @@ declare module "lucide-react" {
   export const CheckCircle: Icon;
   export const X: Icon;
   export const RefreshCw: Icon;
+  export const Network: Icon;
+  export const Search: Icon;
+  export const BookOpen: Icon;
+  export const Lightbulb: Icon;
+  export const TrendingUp: Icon;
+  export const XCircle: Icon;
+  export const Users: Icon;
+  export const Clock: Icon;
+  export const TrendingDown: Icon;
+  export const ExternalLink: Icon;
+  export const Filter: Icon;
+  export const Layers: Icon;
+  export const Download: Icon;
 }

@@ -1,4 +1,4 @@
-import type { PlantState, Alert, Permit, SensorReading, RiskAssessment, EmergencyResponse, HistoricalIncident, WorkerLocation, CopilotMessage } from "./types";
+import type { PlantState, Alert, Permit, SensorReading, RiskAssessment, EmergencyResponse, HistoricalIncident, WorkerLocation, CopilotMessage, ZonePredictions, WhatIfResult, PpeViolation, PpeDetectionEvent, PpeCamera, PpeStats, Notification, NotificationStats } from "./types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -107,4 +107,72 @@ export const api = {
 
   triggerEvacuation: (zoneId: string) =>
     fetchApi<{ data: { success: boolean } }>(`/api/emergency/evacuate/${zoneId}`, { method: "POST" }),
+
+  getKgStatus: () => fetchApi<{ data: { built: boolean; node_count: number; edge_count: number } }>("/api/knowledge-graph/status"),
+
+  queryKg: (query: string) =>
+    fetchApi<{ data: { query: string; interpretation: string; findings: any[]; regulations: any[]; recommendations: string[] } }>(`/api/knowledge-graph/query?q=${encodeURIComponent(query)}`),
+
+  getKgGraph: () =>
+    fetchApi<{ data: { nodes: { id: string; label: string; type: string }[]; edges: { source: string; target: string; relationship: string }[] } }>("/api/knowledge-graph/graph"),
+
+  getKgZone: (zoneId: string) =>
+    fetchApi<{ data: { nodes: { id: string; label: string; type: string; data?: any }[]; edges: { source: string; target: string; relationship: string }[] } }>(`/api/knowledge-graph/zone/${zoneId}`),
+
+  getKgSimilarIncidents: (zoneId: string, gases?: string[], permits?: string[]) => {
+    const params = new URLSearchParams({ zone_id: zoneId });
+    if (gases?.length) params.set("gases", gases.join(","));
+    if (permits?.length) params.set("permits", permits.join(","));
+    return fetchApi<{ data: any[] }>(`/api/knowledge-graph/incidents/similar?${params.toString()}`);
+  },
+
+  getKgRegulations: (zoneId: string, gases?: string[], permits?: string[]) => {
+    const params = new URLSearchParams({ zone_id: zoneId });
+    if (gases?.length) params.set("gases", gases.join(","));
+    if (permits?.length) params.set("permits", permits.join(","));
+    return fetchApi<{ data: any[] }>(`/api/knowledge-graph/regulations?${params.toString()}`);
+  },
+
+  getKgPatterns: (incidentType?: string) => {
+    const params = incidentType ? `?incident_type=${encodeURIComponent(incidentType)}` : "";
+    return fetchApi<{ data: any }>(`/api/knowledge-graph/patterns${params}`);
+  },
+
+  getKgPreventionIntelligence: (zoneId?: string) => {
+    const params = zoneId ? `?zone_id=${zoneId}` : "";
+    return fetchApi<{ data: any }>(`/api/knowledge-graph/prevention-intelligence${params}`);
+  },
+
+  getRiskPredictions: (zoneId: string) =>
+    fetchApi<{ data: ZonePredictions }>(`/api/risk/predictions/${zoneId}`),
+
+  runWhatIf: (body: { zoneId: string; overrides: Record<string, number>; scenarioFlags: Record<string, boolean> }) =>
+    fetchApi<{ data: WhatIfResult }>("/api/simulator/what-if", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  runPpeDetection: () =>
+    fetchApi<{ data: { scanned: number; violations: PpeViolation[]; message: string } }>("/api/cv/detect", { method: "POST" }),
+
+  getPpeViolations: () =>
+    fetchApi<{ data: PpeViolation[] }>("/api/cv/violations"),
+
+  acknowledgePpeViolation: (violationId: string) =>
+    fetchApi<{ data: { success: boolean } }>(`/api/cv/violations/${violationId}/acknowledge`, { method: "POST" }),
+
+  getPpeCameras: () =>
+    fetchApi<{ data: PpeCamera[] }>("/api/cv/cameras"),
+
+  getPpeDetectionLog: (limit: number = 50) =>
+    fetchApi<{ data: PpeDetectionEvent[] }>(`/api/cv/log?limit=${limit}`),
+
+  getPpeStats: () =>
+    fetchApi<{ data: PpeStats }>("/api/cv/stats"),
+
+  getEmergencyNotifications: (limit: number = 50) =>
+    fetchApi<{ data: Notification[] }>(`/api/emergency/notifications?limit=${limit}`),
+
+  getEmergencyNotificationStats: () =>
+    fetchApi<{ data: NotificationStats }>("/api/emergency/notification-stats"),
 };

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Shield, LayoutDashboard, Map, ClipboardList, BarChart3, Bell, AlertTriangle, Bot, Settings, Activity } from "lucide-react";
+import { Shield, LayoutDashboard, Map, ClipboardList, BarChart3, Bell, AlertTriangle, Bot, Settings, Activity, Network, Zap, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RiskLevel } from "@/lib/types";
 
@@ -19,8 +19,11 @@ const navItems = [
   { href: "/heatmap", label: "Plant Heatmap", icon: Map },
   { href: "/permits", label: "Permit Intel", icon: ClipboardList },
   { href: "/incidents", label: "Incident RAG", icon: BarChart3 },
+  { href: "/knowledge-graph", label: "Knowledge Graph", icon: Network },
   { href: "/alerts", label: "Alert Center", icon: Bell },
   { href: "/emergency", label: "Emergency", icon: AlertTriangle },
+  { href: "/cctv", label: "CCTV Analytics", icon: Layers },
+  { href: "/what-if", label: "What-If Sim", icon: Zap },
   { href: "/copilot", label: "AI Copilot", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { api } from "@/lib/api";
 import { wsClient } from "@/lib/websocket";
-import type { PlantState, EmergencyResponse } from "@/lib/types";
+import type { PlantState, EmergencyResponse, Notification } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const REGULATORY_CHECKLIST = [
@@ -25,17 +25,20 @@ export default function EmergencyPage() {
   const [triggering, setTriggering] = useState(false);
   const [reportEdits, setReportEdits] = useState<Record<string, string>>({});
   const [checklist, setChecklist] = useState(REGULATORY_CHECKLIST.map(c => ({ ...c })));
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const fetchData = useCallback(async () => {
     try {
-      const [demoRes, emgRes, workerRes] = await Promise.all([
+      const [demoRes, emgRes, workerRes, notifRes] = await Promise.all([
         api.getPlantState(),
         api.getEmergency(),
         api.getWorkers(true),
+        api.getEmergencyNotifications(20).catch(() => null),
       ]);
       if (demoRes.data) setPlantState(demoRes.data);
       if (emgRes.data !== undefined) setEmergency(emgRes.data);
       if (workerRes.data) setWorkers(workerRes.data);
+      if (notifRes?.data) setNotifications(notifRes.data);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   }, []);
@@ -308,15 +311,35 @@ export default function EmergencyPage() {
           </div>
 
           <div className="glass-card p-5">
-            <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Zone Status</h3>
-            <div className="space-y-1.5">
-              {plantState.zones.map(z => (
-                <div key={z.zoneId} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
-                  <div className="flex items-center gap-2"><div className={cn("w-1.5 h-1.5 rounded-full", z.riskLevel === "CRITICAL" ? "bg-red-500 animate-pulse" : z.riskLevel === "HIGH" ? "bg-orange-500" : z.riskLevel === "CAUTION" ? "bg-amber-500" : "bg-emerald-500")} /><span className="text-[11px] text-gray-400">{z.name}</span></div>
-                  <span className="text-[11px] font-mono-data font-bold" style={{ color: z.riskScore > 75 ? "#EF4444" : z.riskScore > 50 ? "#F97316" : z.riskScore > 25 ? "#F59E0B" : "#10B981" }}>{z.riskScore}</span>
-                </div>
-              ))}
-            </div>
+            <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Notification History</h3>
+            {notifications.length > 0 ? (
+              <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+                {notifications.map((n) => {
+                  const channelIcon: Record<string, string> = {
+                    whatsapp: "💬", sms: "📱", email: "📧", pa_system: "📢",
+                  };
+                  const channelColor: Record<string, string> = {
+                    whatsapp: "text-emerald-400", sms: "text-blue-400", email: "text-purple-400", pa_system: "text-amber-400",
+                  };
+                  return (
+                    <div key={n.notificationId} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span>{channelIcon[n.channel] || "📨"}</span>
+                        <span className={cn("text-[9px] font-bold uppercase", channelColor[n.channel] || "text-gray-400")}>{n.channel}</span>
+                        <span className="text-[9px] text-gray-600 ml-auto">{new Date(n.timestamp).toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit" })}</span>
+                      </div>
+                      <p className="text-[10px] text-gray-400 line-clamp-2">{n.message}</p>
+                      <p className="text-[8px] text-gray-600 mt-1">{n.recipient}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-6">
+                <p className="text-[11px] text-gray-600">No notifications dispatched yet</p>
+                <p className="text-[9px] text-gray-700 mt-1">Notifications are sent via WhatsApp, SMS, Email, and PA System during emergencies</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

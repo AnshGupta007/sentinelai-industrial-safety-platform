@@ -1,5 +1,6 @@
 from typing import Dict, List
 from data.simulator import get_emergency, get_workers, get_permits, get_risk_assessments, get_current_sensors, ZONE_CONFIG
+from notifications.simulator import dispatch_emergency_notifications
 
 TRIGGER_THRESHOLD = 75
 
@@ -79,10 +80,19 @@ def orchestrate_response(zone_id: str, step_start_time: float = None) -> Dict:
         step_elapsed = elapsed - s["delay"]
         if step_elapsed >= 0:
             if step_elapsed >= 2:
-                response_sequence.append({
+                completed_item = {
                     "step": s["step"], "action": s["label"],
                     "completed": True, "inProgress": False
-                })
+                }
+                if s["step"] == 2 and not response_sequence:
+                    zone = next((z for z in ZONE_CONFIG if z["zoneId"] == zone_id), None)
+                    assessment = get_zone_assessment(zone_id)
+                    dispatch_emergency_notifications(
+                        zone["name"] if zone else zone_id,
+                        assessment["riskScore"] if assessment else 80,
+                        "Immediate evacuation required"
+                    )
+                response_sequence.append(completed_item)
             else:
                 response_sequence.append({
                     "step": s["step"], "action": s["label"],

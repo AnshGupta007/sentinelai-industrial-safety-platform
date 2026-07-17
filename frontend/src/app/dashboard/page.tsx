@@ -3,11 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { RiskScoreGauge, SensorCard, AlertFeed, ZoneStatusGrid, CompoundRiskPanel } from "@/components/dashboard/index";
+import WithWithoutComparison from "@/components/dashboard/WithWithoutComparison";
 import { SensorTimeSeriesChart, RiskTrendChart } from "@/components/charts/index";
 import { api } from "@/lib/api";
 import { wsClient } from "@/lib/websocket";
-import type { PlantState, Alert as AlertType } from "@/lib/types";
+import type { PlantState, Alert as AlertType, ZonePredictions, RiskPredictionPoint } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
 
 export default function DashboardPage() {
   const [plantState, setPlantState] = useState<PlantState | null>(null);
@@ -16,15 +18,19 @@ export default function DashboardPage() {
   const [riskTrend, setRiskTrend] = useState<Array<{ time: string; score: number }>>([]);
   const [selectedZone, setSelectedZone] = useState<string>("ZONE_A");
   const [loading, setLoading] = useState(true);
+  const [predictions, setPredictions] = useState<ZonePredictions | null>(null);
+  const [predictionPoints, setPredictionPoints] = useState<RiskPredictionPoint[]>([]);
+  const [predictionWarning, setPredictionWarning] = useState<string | null>(null);
   const plantRef = useRef<PlantState | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const [demoRes, alertRes, historyRes, riskHistRes] = await Promise.all([
+      const [demoRes, alertRes, historyRes, riskHistRes, predRes] = await Promise.all([
         api.getPlantState(),
         api.getAlerts(true),
         api.getSensorHistory(selectedZone),
         api.getRiskHistory(),
+        api.getRiskPredictions(selectedZone).catch(() => null),
       ]);
       if (demoRes.data) {
         setPlantState(demoRes.data);
@@ -34,6 +40,26 @@ export default function DashboardPage() {
       if (historyRes.data) setSensorHistory(historyRes.data);
       if (riskHistRes.data) {
         setRiskTrend(riskHistRes.data.map(r => ({ time: r.timestamp, score: r.riskScore })));
+      }
+      if (predRes?.data) {
+        setPredictions(predRes.data);
+        const p = predRes.data;
+        const now = new Date();
+        const pts: RiskPredictionPoint[] = [
+          { time: new Date(now.getTime() + 30 * 60000).toISOString(), score: p.forecastedRisk30, predicted: true },
+          { time: new Date(now.getTime() + 60 * 60000).toISOString(), score: p.forecastedRisk60, predicted: true },
+          { time: new Date(now.getTime() + 90 * 60000).toISOString(), score: p.forecastedRisk90, predicted: true },
+        ];
+        setPredictionPoints(pts);
+        if (p.forecastedRisk30 > 75) {
+          setPredictionWarning(`ML predicts risk reaching ${p.forecastedRisk30}/100 in 30 minutes — preemptive alert triggered`);
+        } else if (p.forecastedRisk60 > 75) {
+          setPredictionWarning(`ML predicts risk reaching ${p.forecastedRisk60}/100 in 60 minutes`);
+        } else if (p.forecastedRisk90 > 75) {
+          setPredictionWarning(`ML predicts risk reaching ${p.forecastedRisk90}/100 in 90 minutes`);
+        } else {
+          setPredictionWarning(null);
+        }
       }
     } catch (err) {
       console.error("Fetch error:", err);
@@ -240,9 +266,51 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 backdrop-blur-sm">
-        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Plant Risk Trend</h3>
-        <RiskTrendChart data={riskTrend} />
+      <WithWithoutComparison />
+
+      {predictionWarning && (
+        <div className="mb-4 px-5 py-3 rounded-xl border bg-purple-500/[0.08] border-purple-500/20 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-purple-400 shrink-0" />
+          <span className="text-sm text-purple-200">{predictionWarning}</span>
+        </div>
+      )}
+
+      <div className="grid grid-cols-5 gap-4 mb-5">
+        <div className="col-span-3 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 backdrop-blur-sm">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Plant Risk Trend</h3>
+          <RiskTrendChart data={riskTrend} predictions={predictionPoints} />
+        </div>
+        <div className="col-span-2 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-5 backdrop-blur-sm">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">ML Risk Forecast</h3>
+          {predictions ? (
+            <div className="space-y-3">
+              {[
+                { label: "30 min", risk: predictions.forecastedRisk30, time: "30" },
+                { label: "60 min", risk: predictions.forecastedRisk60, time: "60" },
+                { label: "90 min", risk: predictions.forecastedRisk90, time: "90" },
+              ].map((item) => {
+                const color = item.risk > 75 ? "text-red-400" : item.risk > 50 ? "text-orange-400" : item.risk > 25 ? "text-amber-400" : "text-emerald-400";
+                const Icon = item.risk > (predictions.currentRisk || 0) ? TrendingUp : TrendingDown;
+                return (
+                  <div key={item.time} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <div className="flex items-center gap-3">
+                      <Icon className={cn("w-4 h-4", color)} />
+                      <span className="text-sm text-gray-400">t+{item.label}</span>
+                    </div>
+                    <span className={cn("text-lg font-bold font-mono-data", color)}>{item.risk}</span>
+                  </div>
+                );
+              })}
+              <div className="text-[10px] text-gray-600 text-center pt-1">
+                Confidence: {(predictions as any).predictions?.CH4?.["t30"]?.interval?.confidence ? `${Math.round((predictions as any).predictions.CH4["t30"].interval.confidence * 100)}%` : "N/A"}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-[120px] text-gray-600 text-sm">
+              Prediction model unavailable
+            </div>
+          )}
+        </div>
       </div>
     </PageWrapper>
   );

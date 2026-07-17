@@ -10,6 +10,7 @@ class AgentState(TypedDict):
     sensor_analysis: dict
     permit_analysis: dict
     worker_analysis: dict
+    predictive_risk: dict
     compound_analysis: dict
     recommendations: List[str]
 
@@ -90,19 +91,54 @@ def worker_safety_agent(state: AgentState) -> dict:
     }
     return {"worker_analysis": result}
 
+def predictive_risk_agent(state: AgentState) -> dict:
+    zone_id = state["zone_id"]
+    try:
+        from models.predictive_risk import get_predictions
+        preds = get_predictions(zone_id)
+        predicted_risk_30 = preds.get("forecastedRisk30", 0)
+        predicted_risk_60 = preds.get("forecastedRisk60", 0)
+        predicted_risk_90 = preds.get("forecastedRisk90", 0)
+        critical_predicted = predicted_risk_30 > 75 or predicted_risk_60 > 75
+        result = {
+            "zone_id": zone_id,
+            "predictions": preds,
+            "predictedRisk30": predicted_risk_30,
+            "predictedRisk60": predicted_risk_60,
+            "predictedRisk90": predicted_risk_90,
+            "criticalPredicted": critical_predicted,
+            "preemptiveAlert": critical_predicted,
+        }
+    except Exception:
+        result = {
+            "zone_id": zone_id,
+            "predictions": {},
+            "predictedRisk30": 0, "predictedRisk60": 0, "predictedRisk90": 0,
+            "criticalPredicted": False, "preemptiveAlert": False,
+        }
+    return {"predictive_risk": result}
+
 def compound_risk_synthesizer(state: AgentState) -> dict:
     zone_id = state["zone_id"]
     risk = calculate_risk(zone_id)
     sensor = state.get("sensor_analysis", {})
     permit = state.get("permit_analysis", {})
     worker = state.get("worker_analysis", {})
+    pred = state.get("predictive_risk", {})
     compound_score = risk["riskScore"]
     triggered = risk["triggeredRules"]
     if sensor.get("anomaly_count", 0) >= 3 and permit.get("conflict_count", 0) >= 1:
         overload_bonus = 10
         compound_score = min(100, compound_score + overload_bonus)
         triggered.append({"ruleId": "RULE_OVERLOAD", "description": "3+ sensor anomalies + permit conflicts", "contribution": overload_bonus, "evidence": {"anomalyCount": sensor["anomaly_count"], "conflictCount": permit["conflict_count"]}})
+    if pred.get("preemptiveAlert"):
+        prediction_bonus = 15
+        compound_score = min(100, compound_score + prediction_bonus)
+        pred_risk = pred.get("predictedRisk30", 0)
+        triggered.append({"ruleId": "RULE_PREDICTIVE", "description": f"ML predicts risk reaching {pred_risk}/100 in 30 min", "contribution": prediction_bonus, "evidence": {"predictedRisk30": pred_risk, "predictedRisk60": pred.get("predictedRisk60", 0)}})
     pred_horizon = f"{max(15, 90 - compound_score)} min to critical" if compound_score > 60 else "> 2 hours"
+    if pred.get("predictedRisk30", 0) > 50:
+        pred_horizon = f"ML: {pred.get('predictedRisk30', 0)}/100 predicted in 30min"
     result = {
         "zone_id": zone_id,
         "risk_score": compound_score,
@@ -179,19 +215,21 @@ graph = StateGraph(AgentState)
 graph.add_node("sensor_analysis", sensor_analysis_agent)
 graph.add_node("permit_cross_ref", permit_cross_reference_agent)
 graph.add_node("worker_safety", worker_safety_agent)
+graph.add_node("predictive_risk", predictive_risk_agent)
 graph.add_node("synthesizer", compound_risk_synthesizer)
 graph.add_node("recommender", recommendation_agent)
 graph.set_entry_point("sensor_analysis")
 graph.add_edge("sensor_analysis", "permit_cross_ref")
 graph.add_edge("permit_cross_ref", "worker_safety")
-graph.add_edge("worker_safety", "synthesizer")
+graph.add_edge("worker_safety", "predictive_risk")
+graph.add_edge("predictive_risk", "synthesizer")
 graph.add_edge("synthesizer", "recommender")
 graph.add_edge("recommender", END)
 
 compiled_graph = graph.compile()
 
 
-def flatten_assessment(zone_id: str, compound: dict, sensor: dict, permit: dict, worker: dict, recs: list) -> dict:
+def flatten_assessment(zone_id: str, compound: dict, sensor: dict, permit: dict, worker: dict, pred: dict, recs: list) -> dict:
     return {
         "zone_id": zone_id,
         "risk_score": compound.get("risk_score", 0),
@@ -202,6 +240,13 @@ def flatten_assessment(zone_id: str, compound: dict, sensor: dict, permit: dict,
         "workers_affected": worker.get("workers_in_danger", 0),
         "prediction_horizon": compound.get("prediction_horizon", "> 2 hours"),
         "confidence": compound.get("confidence", 0.85),
+        "predictive_risk": {
+            "predictions": pred.get("predictions", {}),
+            "predictedRisk30": pred.get("predictedRisk30", 0),
+            "predictedRisk60": pred.get("predictedRisk60", 0),
+            "predictedRisk90": pred.get("predictedRisk90", 0),
+            "preemptiveAlert": pred.get("preemptiveAlert", False),
+        },
         "timestamp": compound.get("timestamp", __import__("datetime").datetime.now().isoformat()),
     }
 
@@ -211,6 +256,7 @@ def run_multi_agent_pipeline(zone_id: str) -> dict:
         "sensor_analysis": {},
         "permit_analysis": {},
         "worker_analysis": {},
+        "predictive_risk": {},
         "compound_analysis": {},
         "recommendations": [],
     }
@@ -222,6 +268,7 @@ def run_multi_agent_pipeline(zone_id: str) -> dict:
             result.get("sensor_analysis", {}),
             result.get("permit_analysis", {}),
             result.get("worker_analysis", {}),
+            result.get("predictive_risk", {}),
             result.get("recommendations", []),
         )
     except Exception as e:
@@ -229,6 +276,7 @@ def run_multi_agent_pipeline(zone_id: str) -> dict:
         return flatten_assessment(
             zone_id,
             risk,
+            {},
             {},
             {},
             {},

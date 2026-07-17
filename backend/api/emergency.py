@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from data.simulator import get_emergency, suspend_zone_permits, trigger_evacuation, state as sim_state, get_zone_risk, ZONE_CONFIG
 from agents.emergency_orchestrator import orchestrate_response, generate_incident_report, check_trigger_condition
+from notifications.simulator import dispatch_emergency_notifications, get_notification_history, get_notification_stats
 
 router = APIRouter()
 
@@ -27,6 +28,8 @@ async def emergency_trigger(body: dict = None):
         "message": f"Manual emergency trigger for {zone_id}",
         "steps": []
     }
+    zone_name = next((z["name"] for z in ZONE_CONFIG if z["zoneId"] == zone_id), zone_id)
+    dispatch_emergency_notifications(zone_name, risk["riskScore"] if risk else 80, "Immediate evacuation required")
     return {"data": {"success": True, "emergency": sim_state.emergency}, "timestamp": __import__("datetime").datetime.now().isoformat()}
 
 @router.post("/resolve")
@@ -62,3 +65,11 @@ async def emergency_suspend_permits(zone_id: str):
 async def emergency_evacuate(zone_id: str):
     success = trigger_evacuation(zone_id)
     return {"data": {"success": success}, "timestamp": __import__("datetime").datetime.now().isoformat()}
+
+@router.get("/notifications")
+async def emergency_notifications(limit: int = 50):
+    return {"data": get_notification_history(limit), "timestamp": __import__("datetime").datetime.now().isoformat()}
+
+@router.get("/notification-stats")
+async def emergency_notification_stats():
+    return {"data": get_notification_stats(), "timestamp": __import__("datetime").datetime.now().isoformat()}

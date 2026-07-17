@@ -84,9 +84,10 @@ export function SensorTimeSeriesChart({ data, thresholds }: SensorTimeSeriesChar
 
 interface RiskTrendChartProps {
   data: Array<{ time: string; score: number }>;
+  predictions?: Array<{ time: string; score: number; lower?: number; upper?: number }>;
 }
 
-export function RiskTrendChart({ data }: RiskTrendChartProps) {
+export function RiskTrendChart({ data, predictions }: RiskTrendChartProps) {
   const chartData = useMemo(() => {
     const sorted = [...data].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     return sorted.map((d, i) => ({
@@ -96,22 +97,50 @@ export function RiskTrendChart({ data }: RiskTrendChartProps) {
     }));
   }, [data]);
 
+  const predictionData = useMemo(() => {
+    if (!predictions || predictions.length === 0) return [];
+    return predictions.map(d => ({
+      time: new Date(d.time).toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit" }),
+      score: d.score,
+      lower: d.lower,
+      upper: d.upper,
+    }));
+  }, [predictions]);
+
+  const combinedData = useMemo(() => {
+    if (predictionData.length === 0) return chartData;
+    const lastActual = chartData[chartData.length - 1];
+    if (!lastActual) return chartData;
+    return [...chartData, ...predictionData];
+  }, [chartData, predictionData]);
+
   const interval = Math.max(1, Math.floor(chartData.length / 12));
+  const hasPredictions = predictionData.length > 0;
 
   return (
     <ResponsiveContainer width="100%" height={180}>
-      <AreaChart data={chartData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+      <AreaChart data={combinedData} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
         <defs>
           <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#EF4444" stopOpacity={0.15} />
             <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="predGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.1} />
+            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
         <XAxis dataKey="time" tick={{ fill: '#4B5563', fontSize: 9 }} interval={interval} axisLine={{ stroke: 'rgba(255,255,255,0.06)' }} />
         <YAxis domain={[0, 100]} tick={{ fill: '#4B5563', fontSize: 9 }} axisLine={{ stroke: 'rgba(255,255,255,0.06)' }} />
         <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: '#6B7280', fontSize: 10 }} formatter={(value) => [`${value}/100`, "Risk Score"]} />
-        <Area type="monotone" dataKey="score" stroke="#EF4444" fill="url(#riskGradient)" strokeWidth={2} />
+        {hasPredictions && (
+          <>
+            <Area type="monotone" dataKey="upper" stroke="none" fill="url(#predGradient)" strokeWidth={0} connectNulls />
+            <Line type="monotone" dataKey="score" stroke="#8B5CF6" strokeWidth={2} strokeDasharray="6 3" dot={false} connectNulls />
+          </>
+        )}
+        <Area type="monotone" dataKey="score" stroke="#EF4444" fill="url(#riskGradient)" strokeWidth={2} connectNulls />
       </AreaChart>
     </ResponsiveContainer>
   );
