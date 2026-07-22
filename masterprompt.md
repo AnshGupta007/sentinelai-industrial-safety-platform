@@ -1110,7 +1110,7 @@ AI-powered compound risk detection engine that correlates:
 6. AI Safety Copilot
 
 ### Tech Stack
-[list all technologies]
+list all technologies
 
 ### Setup Instructions
 [step by step]

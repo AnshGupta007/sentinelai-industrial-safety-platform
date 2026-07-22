@@ -12,3 +12,4 @@ chroma_db/
 frontend/.next/
 backend/__pycache__/
 chromadb/
+masterprompt.md

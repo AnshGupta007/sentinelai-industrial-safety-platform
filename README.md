@@ -1,165 +1,221 @@
-<div align="center">
-  <img src="https://img.shields.io/badge/status-production-brightgreen?style=for-the-badge" alt="Status"/>
-  <img src="https://img.shields.io/badge/python-3.11+-blue?style=for-the-badge&logo=python" alt="Python"/>
-  <img src="https://img.shields.io/badge/next.js-16-000?style=for-the-badge&logo=nextdotjs" alt="Next.js"/>
-  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/LangGraph-1.0+-purple?style=for-the-badge" alt="LangGraph"/>
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License"/>
-</div>
+# 🛡️ SentinelAI — Industrial Safety Intelligence Platform
 
-<br/>
+[![Python Version](https://img.shields.io/badge/python-3.11+-blue?style=flat&logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000?style=flat&logo=nextdotjs)](https://nextjs.org/)
+[![LangGraph](https://img.shields.io/badge/LangGraph-1.0+-purple?style=flat)](https://langchain-ai.github.io/langgraph/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-Vector--Store-orange?style=flat)](https://www.trychroma.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=flat&logo=postgresql)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-purple?style=flat)]()
 
-<div align="center">
-  <h1>🛡️ SentinelAI</h1>
-  <h3>AI-Powered Industrial Safety Intelligence for Zero-Harm Operations</h3>
-  <p><i>"Data existed. Intelligence did not. Until now."</i></p>
-</div>
+**SentinelAI** is the central, unified AI-powered Industrial Safety Intelligence platform that fuses data from IoT sensors, SCADA systems, permit-to-work logs, CCTV feeds, and shift records into a single predictive intelligence layer. It detects **compound risk conditions** — like co-occurring maintenance activity and hazardous gas accumulation — that no single sensor would ever flag alone, and triggers **preemptive interventions** before they escalate into fatalities.
 
-<br/>
+> **"Data existed. Intelligence did not. Until now."** — The problem is not absence of technology. It is absence of a unified intelligence layer.
 
 ---
 
-## 📋 Table of Contents
+## 📦 Project Ecosystem
 
-- [The Problem](#-the-problem)
-- [The Solution](#-the-solution)
-- [Architecture](#-architecture)
-- [Key Features](#-key-features)
-- [Demo: Vizag Replay Prevention](#-demo-vizag-replay-prevention)
-- [Tech Stack](#-tech-stack)
-- [Quick Start](#-quick-start)
-- [API Reference](#-api-reference)
-- [Real-time WebSocket Events](#-real-time-websocket-events)
-- [Frontend Pages](#-frontend-pages)
-- [Impact & Metrics](#-impact--metrics)
-- [Judging Criteria](#-judging-criteria)
+| Module | Description | Status |
+| :--- | :--- | :--- |
+| **`backend/`** | FastAPI backend — 11 routers, LangGraph multi-agent pipeline, RAG engine, simulation engine | ✅ Active |
+| **`frontend/`** | Next.js 16 App Router — 11 pages, WebSocket streaming, Leaflet heatmap, client-side fallback simulator | ✅ Active |
+| **`data/incidents/`** | 20 real historical Indian industrial incident records (Bhilai, Rourkela, Vizag, Tata Steel, JSW) | ✅ Active |
+| **`data/regulations/`** | 3 regulatory documents (OISD-105 Guidelines, Factory Act 1948, DGMS Mining Safety) | ✅ Active |
+| **`data/plant/`** | 6-zone plant layout configuration with coordinates | ✅ Active |
 
 ---
 
-## 🔥 The Problem
+## 🏗️ Architectural Layers
 
-> **January 2025.** Eight workers died at Visakhapatnam Steel Plant when entrapped gases triggered an explosion in the coke oven battery. The plant had functioning gas detectors, permit-to-work controls, and SCADA. Investigation found warning signals from gas pressure sensors existed — **but no intelligence layer connected those readings to operational decisions in time.**
-
-**6,500+** fatal workplace accidents in India (FY2023 — DGFASLI), excluding most mining & construction.
-
-**60%+** of large Indian industrial facilities rely on manual handoffs between digital safety tools (FICCI 2024).
-
-**The problem is not absence of technology. It is absence of a unified intelligence layer.**
-
----
-
-## 🎯 The Solution
-
-**SentinelAI** is a full-stack, AI-powered industrial safety platform that fuses data from IoT sensors, SCADA systems, permit-to-work logs, CCTV feeds, and shift records into a **single predictive intelligence layer**.
-
-It detects **compound risk conditions** — like confined space entry during gas accumulation — that no single sensor would flag alone, and triggers **preemptive interventions** before they escalate into fatalities.
-
-| Without SentinelAI | With SentinelAI |
-|-------------------|-----------------|
-| Siloed sensors, manual handoffs | Unified multi-agent AI pipeline |
-| Reactive — acts *after* the incident | Predictive — acts *before* the threshold |
-| Single-sensor alerts miss compound risks | 7 compound risk rules catch dangerous combinations |
-| 10+ minutes of chaos on emergency | 60-second automated orchestration |
-
----
-
-## 🏗 Architecture
+SentinelAI is organized in a three-layer architecture to separate concerns, isolate execution routes, and ensure zero silent failures:
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│                            PRESENTATION LAYER                                     │
-│                                                                                   │
-│  ┌───────────┐ ┌──────────┐ ┌───────────┐ ┌───────────┐ ┌──────────────────┐    │
-│  │ Dashboard │ │ Heatmap  │ │  Permits  │ │ Incidents │ │ Emergency Cmd    │    │
-│  │  /dashboard│ │ /heatmap │ │  /permits │ │ /incidents│ │   /emergency     │    │
-│  └─────┬─────┘ └────┬─────┘ └─────┬─────┘ └─────┬─────┘ └────────┬─────────┘    │
-│        │            │             │             │               │                │
-│  ┌─────┴─────┐ ┌────┴────┐ ┌─────┴─────┐ ┌─────┴──────┐ ┌──────┴────────┐     │
-│  │ Risk Gauge│ │ Leaflet │ │PermitTable│ │ RAG Query  │ │Orchestration  │     │
-│  │ +Zone Grid│ │ +Workers│ │+SIMOPS Mat│ │ Interface  │ │   Timeline    │     │
-│  └───────────┘ └─────────┘ └───────────┘ └────────────┘ └───────────────┘     │
-│                                                                                   │
-│  ┌───────────┐ ┌──────────┐ ┌────────────┐ ┌──────────────┐                      │
-│  │ Copilot   │ │ CCTV/PPE│ │ Knowledge  │ │  What-If     │                      │
-│  │ /copilot  │ │ /cctv   │ │ Graph      │ │  Simulator   │                      │
-│  └─────┬─────┘ └────┬─────┘ └─────┬──────┘ └──────┬───────┘                      │
-│        │            │             │               │                                │
-│        └────────────┴─────────────┴───────────────┘                                │
-│                              │                                                     │
-│                      ┌───────┴───────┐                                             │
-│                      │  WebSocket    │                                            │
-│                      │  Provider     │                                            │
-│                      └───────┬───────┘                                             │
-│                              │ WS events                                          │
-└──────────────────────────────┼────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                        PRESENTATION LAYER (frontend/)                          │
+│              Next.js 16 · React 19 · TypeScript 5.9 · Tailwind CSS 4          │
+├──────────────────────────────────────────────────────────────────────────────┤
+│   ┌───────────┐ ┌──────────┐ ┌───────────┐ ┌───────────┐ ┌────────────────┐ │
+│   │ Dashboard │ │ Heatmap  │ │  Permits  │ │ Incidents │ │ Emergency Cmd  │ │
+│   │  /dashboard│ │ /heatmap │ │  /permits │ │ /incidents│ │   /emergency   │ │
+│   └─────┬─────┘ └────┬─────┘ └─────┬─────┘ └─────┬─────┘ └────────┬───────┘ │
+│   ┌─────┴─────┐ ┌────┴────┐ ┌─────┴─────┐ ┌─────┴──────┐ ┌──────┴────────┐ │
+│   │ Copilot   │ │ CCTV/PPE│ │ Knowledge  │ │  What-If   │ │   Settings   │ │
+│   │ /copilot  │ │ /cctv   │ │ Graph      │ │  Simulator │ │  /settings   │ │
+│   └───────────┘ └─────────┘ └────────────┘ └────────────┘ └──────────────┘ │
+│                              │                                                │
+│                      ┌───────┴───────┐                                        │
+│                      │  WebSocket    │                                       │
+│                      │  Provider     │                                       │
+│                      └───────┬───────┘                                        │
+└──────────────────────────────┼────────────────────────────────────────────────┘
+                               │ REST + WS
+═══════════════════════════════╪═══════════════════════════════════════════════════
+┌──────────────────────────────┼────────────────────────────────────────────────┐
+│                    INTELLIGENCE LAYER (backend/)                                │
+│              Python FastAPI · LangGraph · Groq LLM · Redis Pub/Sub             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │                   MULTI-AGENT LANGGRAPH PIPELINE                        │  │
+│  │                                                                         │  │
+│  │  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                 │  │
+│  │  │  Sensor      │ → │  Permit      │ → │  Worker      │                 │  │
+│  │  │  Analysis    │   │  Cross-Ref   │   │  Safety      │                 │  │
+│  │  │  Agent       │   │  Agent       │   │  Agent       │                 │  │
+│  │  └──────────────┘   └──────────────┘   └──────────────┘                 │  │
+│  │         │                   │                    │                        │  │
+│  │         └───────────────────┴────────────────────┘                        │  │
+│  │                           ↓                                                │  │
+│  │  ┌────────────────────────────────────────────────────────────────────┐  │  │
+│  │  │              Compound Risk Synthesizer Agent                       │  │  │
+│  │  │  7 rules · time-weighted · historical bonus                        │  │  │
+│  │  └──────────────────────────┬─────────────────────────────────────────┘  │  │
+│  │                             ↓                                              │  │
+│  │  ┌────────────────────────────────────────────────────────────────────┐  │  │
+│  │  │              Recommendation Agent (Groq LLM / rule fallback)       │  │  │
+│  │  └────────────────────────────────────────────────────────────────────┘  │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+│                                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │   Permit     │  │  Emergency   │  │ Incident RAG │  │   Knowledge      │  │
+│  │ Intelligence │  │ Orchestrator │  │ (ChromaDB)   │  │   Graph (NX)     │  │
+│  │   Agent      │  │   6-step     │  │  20 incidents│  │   10 node types  │  │
+│  │  6 conflicts │  │   sequence   │  │  + 3 reg docs │  │   MultiDiGraph  │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────────┘  │
+│                                                                               │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │                    DATA & SIMULATION                                     │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌───────────────┐ │  │
+│  │  │  Simulator  │  │ Predictive  │  │  PPE/CCTV   │  │  Notification │ │  │
+│  │  │  6 zones    │  │  ML Model   │  │  Detector   │  │  Engine       │ │  │
+│  │  │  48 sensors │  │ (LinearReg) │  │  8 cameras  │  │  4 channels   │ │  │
+│  │  │  15 permits │  │ 30/60/90min │  │  5 PPE items│  │  W/SMS/E/PA   │ │  │
+│  │  │  50 workers │  │ predictions │  │  violations │  │  templates    │ │  │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘  └───────────────┘ │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────────────┘
                                │
-═══════════════════════════════╪═══════════════════════════════════════════════════════
-                               │ REST API + WebSocket
-┌──────────────────────────────┼────────────────────────────────────────────────────┐
-│                     INTELLIGENCE LAYER (FastAPI)                                   │
-│                              │                                                     │
-│  ┌──────────────────────────────────────────────────────────────────────────┐     │
-│  │                   MULTI-AGENT LANGGRAPH PIPELINE                          │    │
-│  │                                                                           │    │
-│  │  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐                   │    │
-│  │  │  Sensor      │ → │  Permit      │ → │  Worker      │                   │    │
-│  │  │  Analysis    │   │  Cross-Ref   │   │  Safety      │                   │    │
-│  │  │  Agent       │   │  Agent       │   │  Agent       │                   │    │
-│  │  └──────────────┘   └──────────────┘   └──────────────┘                   │    │
-│  │         │                   │                    │                          │    │
-│  │         └───────────────────┴────────────────────┘                          │    │
-│  │                           ↓                                                  │    │
-│  │  ┌──────────────────────────────────────────────────────────────────────┐  │    │
-│  │  │              Compound Risk Synthesizer Agent                         │  │    │
-│  │  │  7 rules · time-weighted · historical bonus                          │  │    │
-│  │  │  Risk = min(100, (sensorRisk + compoundRisk + histBonus) × tEsc)     │  │    │
-│  │  └──────────────────────────┬───────────────────────────────────────────┘  │    │
-│  │                             ↓                                                │    │
-│  │  ┌──────────────────────────────────────────────────────────────────────┐  │    │
-│  │  │              Recommendation Agent (Groq LLM / rule fallback)         │  │    │
-│  │  └──────────────────────────────────────────────────────────────────────┘  │    │
-│  └──────────────────────────────────────────────────────────────────────────┘     │
-│                                                                                   │
-│  ┌──────────────────────────────────────────────────────────────────────────┐     │
-│  │                    SPECIALIZED AGENTS                                      │    │
-│  │                                                                           │    │
-│  │  ┌─────────────────┐  ┌──────────────────┐  ┌─────────────────────────┐  │    │
-│  │  │  Permit          │  │  Emergency        │  │  Incident RAG Agent    │  │    │
-│  │  │  Intelligence    │  │  Orchestrator     │  │  (ChromaDB + LangChain)│  │    │
-│  │  │  Agent           │  │  6-step sequence  │  │  20 incidents + 3 regs │  │    │
-│  │  │  6 conflict rules│  │  (T+0 to T+60s)  │  │  + OISD/DGMS/Fact Act  │  │    │
-│  │  └─────────────────┘  └──────────────────┘  └─────────────────────────┘  │    │
-│  └──────────────────────────────────────────────────────────────────────────┘     │
-│                                                                                   │
-│  ┌──────────────────────────────────────────────────────────────────────────┐     │
-│  │                    DATA & SIMULATION                                       │    │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │    │
-│  │  │  Simulator   │  │  Knowledge   │  │  Predictive  │  │  PPE/CCTV    │  │    │
-│  │  │  6 zones     │  │  Graph       │  │  ML Model    │  │  Detector    │  │    │
-│  │  │  48 sensors  │  │  (NetworkX)  │  │  (LinearReg) │  │  8 cameras   │  │    │
-│  │  │  15 permits  │  │  10 node     │  │  30/60/90min │  │  5 PPE items │  │    │
-│  │  │  50 workers  │  │  types       │  │  predictions │  │  violations  │  │    │
-│  │  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  │    │
-│  └──────────────────────────────────────────────────────────────────────────┘     │
-└──────────────────────────────────────────────────────────────────────────────────┘
-                               │
-═══════════════════════════════╪═══════════════════════════════════════════════════════
-                               │
-┌──────────────────────────────┼────────────────────────────────────────────────────┐
-│                     DATA LAYER                                                     │
-│                                                                                   │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐  ┌────────────────┐  │
-│  │   PostgreSQL    │  │     Redis      │  │    ChromaDB    │  │   Regulatory   │  │
-│  │   (primary)     │  │  (pub/sub)     │  │  (vector store)│  │   Documents    │  │
-│  │     ↓           │  │                │  │                │  │   (text files) │  │
-│  │   SQLite        │  │  In-memory     │  │                │  │                │  │
-│  │   (fallback)    │  │  (fallback)    │  │                │  │                │  │
-│  └────────────────┘  └────────────────┘  └────────────────┘  └────────────────┘  │
-│                                                                                   │
-│  🛡️ Graceful Degradation: PostgreSQL unavailable → SQLite · Redis unavailable →   │
-│     in-memory · Groq LLM unavailable → rule-based fallback · Backend unavailable   │
-│     → client-side simulator (695 lines)                                            │
-└──────────────────────────────────────────────────────────────────────────────────┘
+═══════════════════════════════╪═══════════════════════════════════════════════════
+┌──────────────────────────────┼────────────────────────────────────────────────┐
+│                         DATA LAYER                                             │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │  PostgreSQL  │  │    Redis     │  │   ChromaDB   │  │  Regulatory      │  │
+│  │  (primary)   │  │  (pub/sub)   │  │  (vector)    │  │  Documents       │  │
+│  │     ↓        │  │              │  │              │  │  (OISD/Fact Act  │  │
+│  │  SQLite      │  │  In-memory   │  │              │  │  /DGMS)          │  │
+│  │  (fallback)  │  │  (fallback)  │  │              │  │                  │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────────┘  │
+│                                                                               │
+│  🛡️ Graceful Degradation: PostgreSQL → SQLite · Redis → In-memory ·          │
+│     Groq LLM → Rule-based · Backend → Client-side Simulator (695 lines)     │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Layer Breakdown
+
+| Layer | Directory | Responsibility |
+| :--- | :--- | :--- |
+| **Presentation** | `frontend/` | 11 Next.js pages, WebSocket streaming, Leaflet heatmap, Recharts, Framer Motion animations |
+| **Intelligence** | `backend/` | FastAPI server, LangGraph multi-agent pipeline, ChromaDB RAG, NetworkX knowledge graph, ML predictions |
+| **Data** | `data/` | PostgreSQL/SQLite, Redis pub/sub, ChromaDB vector store, regulatory documents, incident records |
+
+---
+
+## 🔄 Process Diagrams & Workflows
+
+### 1. Compound Risk Detection Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Sim as Simulation Engine (2s tick)
+    participant SA as SensorAnalysis Agent
+    participant PC as PermitCrossRef Agent
+    participant WS as WorkerSafety Agent
+    participant PR as PredictiveRisk Agent
+    participant CS as CompoundRisk Synthesizer
+    participant RA as Recommendation Agent
+    participant WSx as WebSocket Broadcaster
+
+    Sim->>SA: Latest sensor readings (48 sensors)
+    SA->>SA: Calculate sensor risk score (0-40)
+    SA->>PC: Sensor risk + active permits
+    PC->>PC: Detect GAS_HAZARD, SIMOPS conflicts
+    PC->>WS: Permit findings + zone data
+    WS->>WS: Identify workers in danger zones
+    WS->>PR: Worker locations + zone conditions
+    PR->>PR: Predict gas trends (30/60/90 min)
+    PR->>CS: All intermediate results
+    CS->>CS: Apply 7 compound rules, compute final risk
+    CS->>RA: Compound risk score + triggered rules
+    alt LLM Available
+        RA->>RA: Groq LLM generates contextual recommendations
+    else Fallback
+        RA->>RA: Rule-based template recommendations
+    end
+    RA->>WSx: Broadcast risk_update + recommendations
+    WSx->>WSx: Push to all connected clients
+```
+
+### 2. 120-Second Demo Escalation Timeline
+
+```mermaid
+flowchart TD
+    subgraph T0 ["T+000s — Normal Operations"]
+        A1[All zones: Risk=18 🟢 SAFE]
+        A2[Sensor readings normal]
+        A3[15 permits active]
+    end
+
+    subgraph T30 ["T+030s — Caution Phase"]
+        B1[Zone A CH4 rising]
+        B2[Confined space permit active]
+        B3[Risk: 35 🟡 CAUTION]
+    end
+
+    subgraph T60 ["T+060s — High Risk"]
+        C1[Ventilation goes offline]
+        C2[RULE_1 + RULE_6 fire]
+        C3[Compound risk detected]
+        C4[Risk: 62 🟠 HIGH]
+    end
+
+    subgraph T90 ["T+090s — Critical ⚠️"]
+        D1[Risk crosses threshold 75]
+        D2[Emergency AUTO-TRIGGERED 🚨]
+        D3[Orchestration begins]
+        D4[Risk: 82 🔴 CRITICAL]
+    end
+
+    subgraph T120 ["T+120s — Emergency Response"]
+        E1[Notifications dispatched]
+        E2[Permits suspended]
+        E3[Evacuation initiated]
+        E4[Risk: 92 🔴 CRITICAL]
+    end
+
+    T0 --> T30 --> T60 --> T90 --> T120
+```
+
+### 3. Emergency Orchestration State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> MONITORING
+    MONITORING --> AUTO_TRIGGERED : risk_score > 75
+    MONITORING --> MANUAL_TRIGGER : operator_override
+    AUTO_TRIGGERED --> ALERT_GENERATION : T+0s
+    MANUAL_TRIGGER --> ALERT_GENERATION : T+0s
+    ALERT_GENERATION --> NOTIFICATIONS_DISPATCHED : T+5s
+    NOTIFICATIONS_DISPATCHED --> PERMITS_SUSPENDED : T+10s
+    PERMITS_SUSPENDED --> EVIDENCE_PRESERVED : T+15s
+    EVIDENCE_PRESERVED --> EVACUATION_TRIGGERED : T+30s
+    EVACUATION_TRIGGERED --> REPORT_GENERATED : T+60s
+    REPORT_GENERATED --> MONITORING : emergency_resolved
+    REPORT_GENERATED --> [*]
 ```
 
 ---
@@ -167,12 +223,11 @@ It detects **compound risk conditions** — like confined space entry during gas
 ## ✨ Key Features
 
 ### 1. 🔬 Compound Risk Detection Engine
-**Multi-agent LangGraph pipeline** with 6 nodes (SensorAnalysis → PermitCrossRef → WorkerSafety → PredictiveRisk → Synthesizer → Recommender).
 
-Detects **7 compound risk rules** that correlate multiple data streams — no single sensor would ever trigger these:
+**Multi-agent LangGraph pipeline** with 6 nodes — detects dangerous combinations no single sensor would flag:
 
 | Rule | Condition | Contribution |
-|------|-----------|:-----------:|
+| :--- | :--- | :---: |
 | RULE_1 | Confined space + elevated gas | **+25** |
 | RULE_2 | Hot work + flammable gas | **+30** |
 | RULE_3 | Maintenance + pressure anomaly | **+20** |
@@ -181,127 +236,63 @@ Detects **7 compound risk rules** that correlate multiple data streams — no si
 | RULE_6 | Ventilation offline + confined space | **+35** |
 | RULE_7 | Night shift + overdue maintenance | **+20** |
 
-> **Risk Score = min(100, (sensorRisk + compoundRisk + historicalBonus) × timeEscalation)**
+> **Risk = min(100, (sensorRisk + compoundRisk + historicalBonus) × timeEscalation)**
 
 ### 2. 🗺️ Geospatial Safety Heatmap
-Real-time Leaflet.js map with 6 zone overlays color-coded by live risk. Tracks **50 workers** with animated positions, **4 muster points**, and shows zone detail drawers with sensor breakdowns.
+Real-time Leaflet.js map with 6 risk-colored zone overlays, 50 animated worker positions, 4 muster points, and clickable zone detail drawers.
 
 ### 3. 📋 Digital Permit Intelligence Agent
-6 conflict detection rules with **regulatory citations** (OISD-105, Factory Act, IE Rules). SIMOPS interaction matrix showing ALL pairwise permit interactions (SAFE / CAUTION / DANGER). Auto-suspension for dangerous permit combinations.
+6 conflict detection rules with regulatory citations (OISD-105, Factory Act, IE Rules). SIMOPS interaction matrix (SAFE/CAUTION/DANGER) + auto-suspension workflow.
 
 ### 4. 📚 Incident RAG Intelligence
-**ChromaDB** vector store loaded with **20 real Indian industrial incidents** (Bhilai, Rourkela, Vizag, Tata Steel, JSW, etc.) and **3 regulatory frameworks** (OISD-105, Factory Act 1948, DGMS Mining Safety). LangChain RetrievalQA with **Groq LLM** for natural language querying.
+ChromaDB vector store with **20 real Indian industrial incidents** + **3 regulatory frameworks**. LangChain RetrievalQA with Groq LLM for natural language querying.
 
 ### 5. 🚨 Emergency Response Orchestrator
-**6-step automated sequence** on trigger (threshold >75):
-1. Alert generation (T+0s)
-2. Multi-channel notifications — WhatsApp, SMS, Email, PA System (T+5s)
-3. Zone permit suspension (T+10s)
-4. Sensor evidence preservation (T+15s)
-5. Evacuation protocol to muster points (T+30s)
-6. OISD-compliant incident report (T+60s)
+6-step automated sequence (T+0s to T+60s): Alert → Notifications (WhatsApp/SMS/Email/PA) → Permit Suspension → Evidence Preservation → Evacuation → OISD-Compliant Report.
 
 ### 6. 🤖 AI Safety Copilot
-Conversational assistant with **real-time plant context** — powered by Groq LLM (llama-3.3-70b-versatile) with rule-based fallback. Knows zones, gas levels, permits, incidents, regulations, and emergency state.
+Conversational assistant with real-time plant context — Groq LLM (llama-3.3-70b-versatile) with rule-based fallback. Knows zones, gas levels, permits, incidents, regulations.
 
 ### 7. 📈 Predictive Risk Analytics (ML)
-scikit-learn **LinearRegression** model predicting CH4, CO, H2S levels **30/60/90 minutes** ahead with confidence intervals (±1.96 × MAE). Converts gas predictions to risk score forecasts.
+scikit-learn LinearRegression predicting CH4, CO, H2S levels **30/60/90 minutes** ahead with confidence intervals.
 
 ### 8. 🔗 Knowledge Graph Intelligence
-**NetworkX MultiDiGraph** with 10+ node types connecting zones, sensors, incidents, regulations, root causes, equipment, workers. Natural language query, root cause pattern clustering (10 categories), and prevention intelligence.
+NetworkX MultiDiGraph (10+ node types) connecting zones, sensors, incidents, regulations, equipment, workers. Natural language query + root cause pattern clustering.
 
 ### 9. 📹 PPE / CCTV Compliance Monitoring
-8 simulated cameras across 6 zones tracking **5 PPE items** (helmet, vest, harness, gloves, goggles) with permit-specific requirements. Violation detection, acknowledgment workflow, and statistics.
+8 cameras × 6 zones tracking 5 PPE items. Permit-specific PPE requirements. Violation detection + acknowledgment workflow.
 
 ### 10. 🔮 What-If Scenario Simulator
-Interactive "what-if" analysis — toggle ventilation offline, hot work, gas leaks, maintenance. Override gas values. See risk score recalculate in real-time.
+Interactive scenario toggles + gas overrides with real-time risk score recalculation.
 
 ---
 
-## 🎬 Demo: Vizag Replay Prevention
-
-The built-in simulator runs a **120-second escalation cycle** demonstrating exactly how SentinelAI prevents the Vizag disaster pattern:
-
-```
-T+000s  ───  All zones normal               Risk: 18  🟢 SAFE
-T+030s  ───  Zone A CH4 rising,             Risk: 35  🟡 CAUTION
-             confined space permit active
-T+060s  ───  Ventilation goes offline       Risk: 62  🟠 HIGH
-T+090s  ───  RULE_1 + RULE_6 fire           Risk: 82  🔴 CRITICAL
-             Emergency AUTO-TRIGGERED 🚨
-T+120s  ───  COMPARISON:
-             WITHOUT SentinelAI → Explosion at T+180s (3 fatalities)
-             WITH    SentinelAI → Evacuated at T+90s  (0 fatalities, 90s advance warning)
-```
-
-### Plant Configuration
-- **6 zones:** Coke Oven, Blast Furnace, Steel Melting, Rolling Mill, Chemical Processing, Raw Material Storage
-- **48 sensors:** CO, H2S, CH4, O2, Temperature, Pressure, Humidity, Vibration
-- **15 permits:** Hot work, confined space, electrical, maintenance, excavation
-- **50 workers:** Operators, Technicians, Supervisors, Welders, Electricians
-
----
-
-## 🛠 Tech Stack
-
-### Frontend
-| Technology | Purpose |
-|------------|---------|
-| **Next.js 16 (App Router)** | React framework |
-| **TypeScript 5.9** | Type safety |
-| **Tailwind CSS 4** | Styling |
-| **Framer Motion** | Animations |
-| **Recharts** | Charts & gauges |
-| **Leaflet + react-leaflet** | Geospatial heatmap |
-| **Lucide React** | Icons |
-| **socket.io-client** | WebSocket client |
-| **Drizzle ORM** | PostgreSQL ORM |
-
-### Backend
-| Technology | Purpose |
-|------------|---------|
-| **Python FastAPI** | REST API framework |
-| **LangChain 1.0+** | LLM orchestration |
-| **LangGraph 1.0+** | Multi-agent pipelines |
-| **Groq LLM** (llama-3.3-70b) | AI inference |
-| **ChromaDB** | Vector store for RAG |
-| **SQLAlchemy** | Database ORM |
-| **NetworkX** | Knowledge graph |
-| **scikit-learn** (LinearRegression) | Predictive ML |
-| **Redis pub/sub** | Real-time messaging |
-| **WebSocket** | Live data streaming |
-
-### Infrastructure
-| Technology | Purpose |
-|------------|---------|
-| **Docker Compose** | Containerization |
-| **PostgreSQL 15** | Primary database |
-| **Redis 7** | Pub/sub + caching |
-| **Railway** | Deployment |
-
----
-
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 20+, Python 3.11+, Docker (optional)
+
+- Python 3.11+
+- Node.js 20+
+- Docker (optional, for containerized deployment)
 
 ### 1. Clone & Environment
+
 ```bash
 git clone <repo-url>
 cd sentinelai-industrial-safety-platform
 cp .env.example .env
-# Add your Groq API key to .env (optional — demo works with fallbacks)
 ```
 
-### 2. Backend
+### 2. Backend Setup
+
 ```bash
 cd backend
 pip install -r requirements.txt
 python -m uvicorn main:app --reload --port 8000
 ```
 
-### 3. Frontend
+### 3. Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -309,162 +300,376 @@ npm run dev
 ```
 
 ### 4. Open
+
 ```
 http://localhost:3000
 ```
 
-### Docker (one-command)
+---
+
+## 🐳 Docker Deployment
+
 ```bash
-docker-compose up
+# Build & run all services
+docker-compose up --build -d
+
+# Services:
+#   frontend → http://localhost:3000
+#   backend  → http://localhost:8000
+#   postgres → port 5432
+#   redis    → port 6379
+#   chromadb → port 8001
 ```
 
 ---
 
-## 📡 API Reference
+## 🔌 API Reference
 
-### Sensors
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/sensors/current` | All sensor readings |
-| `GET` | `/api/sensors/anomalies` | Anomalous readings only |
-| `GET` | `/api/sensors/{zone_id}` | Zone-specific readings |
-| `GET` | `/api/sensors/{zone_id}/history` | Zone history |
+### System & Health
 
-### Risk
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/risk/plant` | Overall plant risk score |
-| `GET` | `/api/risk/zones` | All zone risk assessments |
-| `GET` | `/api/risk/{zone_id}` | Single zone risk |
-| `GET` | `/api/risk/history` | Risk score history |
-| `GET` | `/api/risk/compound/{zone_id}` | Multi-agent pipeline analysis |
-| `GET` | `/api/risk/predictions/{zone_id}` | ML risk predictions |
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/health` | `GET` | Backend health check |
+| `/api/demo` | `GET` | Current demo plant state |
+| `/api/demo` | `POST` | Reset demo to initial state |
+| `/api/demo/advance` | `POST` | Advance demo by one phase |
+| `/api/db/seed` | `POST` | Seed database with sample data |
+| `/api/db/clear` | `POST` | Clear all database records |
+| `/api/rag/status` | `GET` | RAG system status |
 
-### Alerts
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/alerts` | All alerts |
-| `GET` | `/api/alerts/active` | Unacknowledged + unresolved |
-| `POST` | `/api/alerts/{id}/acknowledge` | Acknowledge alert |
-| `POST` | `/api/alerts/{id}/resolve` | Resolve alert |
-| `POST` | `/api/alerts/trigger` | Manual alert trigger |
+### Sensors (`/api/sensors`)
 
-### Permits
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/permits` | All permits |
-| `GET` | `/api/permits/active` | Active/flagged permits |
-| `GET` | `/api/permits/conflicts` | Permit conflict list |
-| `GET` | `/api/permits/simops` | SIMOPS interaction matrix |
-| `POST` | `/api/permits/{id}/suspend` | Suspend a permit |
-| `GET` | `/api/permits/intelligence` | AI analysis of all permits |
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/sensors/current` | `GET` | All current sensor readings |
+| `/api/sensors/anomalies` | `GET` | Anomalous readings only |
+| `/api/sensors/{zone_id}` | `GET` | Zone-specific sensor readings |
+| `/api/sensors/{zone_id}/history` | `GET` | Historical sensor readings for a zone |
 
-### Incidents (RAG)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/incidents` | All incidents (filterable) |
-| `POST` | `/api/incidents/query` | RAG semantic query |
-| `POST` | `/api/incidents/agent-query` | LLM agent query |
-| `GET` | `/api/incidents/patterns` | Incident pattern analysis |
-| `GET` | `/api/incidents/similar` | Similar to current risk |
-| `GET` | `/api/incidents/intelligence` | Prevention intelligence |
+### Risk (`/api/risk`)
 
-### Emergency
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/emergency` | Current emergency state |
-| `POST` | `/api/emergency/trigger` | Manual emergency trigger |
-| `POST` | `/api/emergency/orchestrate/{zone_id}` | Run 6-step orchestration |
-| `POST` | `/api/emergency/resolve` | Resolve emergency |
-| `GET` | `/api/emergency/report/{zone_id}` | Generate incident report |
-| `POST` | `/api/emergency/evacuate/{zone_id}` | Zone evacuation |
-| `GET` | `/api/emergency/notifications` | Notification history |
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/risk/plant` | `GET` | Overall plant risk score |
+| `/api/risk/zones` | `GET` | All zone risk assessments |
+| `/api/risk/{zone_id}` | `GET` | Single zone risk detail |
+| `/api/risk/history` | `GET` | Risk score history timeline |
+| `/api/risk/compound/{zone_id}` | `GET` | Full multi-agent pipeline analysis |
+| `/api/risk/predictions/{zone_id}` | `GET` | ML-based risk predictions |
+
+### Alerts (`/api/alerts`)
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/alerts` | `GET` | All alerts (filterable) |
+| `/api/alerts/active` | `GET` | Active (unresolved) alerts |
+| `/api/alerts/{id}/acknowledge` | `POST` | Acknowledge an alert |
+| `/api/alerts/{id}/resolve` | `POST` | Resolve an alert |
+| `/api/alerts/trigger` | `POST` | Manually trigger an alert |
+
+### Permits (`/api/permits`)
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/permits` | `GET` | All permits |
+| `/api/permits/active` | `GET` | Active and flagged permits |
+| `/api/permits/conflicts` | `GET` | Permits with active conflicts |
+| `/api/permits/simops` | `GET` | SIMOPS interaction matrix |
+| `/api/permits/{id}/suspend` | `POST` | Suspend a permit |
+| `/api/permits/intelligence` | `GET` | AI analysis of all permits |
+
+### Incidents / RAG (`/api/incidents`)
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/incidents` | `GET` | All historical incidents |
+| `/api/incidents/query` | `POST` | RAG-powered semantic query |
+| `/api/incidents/agent-query` | `POST` | LLM agent query |
+| `/api/incidents/patterns` | `GET` | Incident type distribution |
+| `/api/incidents/similar` | `GET` | Similar to current risk |
+| `/api/incidents/intelligence` | `GET` | Prevention intelligence |
+
+### Emergency (`/api/emergency`)
+
+| Endpoint | Method | Description |
+| :--- | :---: | :--- |
+| `/api/emergency` | `GET` | Current emergency status |
+| `/api/emergency/trigger` | `POST` | Manual emergency trigger |
+| `/api/emergency/orchestrate/{zone_id}` | `POST` | Run 6-step orchestration |
+| `/api/emergency/report/{zone_id}` | `GET` | OISD-compliant incident report |
+| `/api/emergency/evacuate/{zone_id}` | `POST` | Trigger zone evacuation |
+| `/api/emergency/suspend-permits/{zone_id}` | `POST` | Suspend all zone permits |
+| `/api/emergency/notifications` | `GET` | Notification history |
+| `/api/emergency/notification-stats` | `GET` | Notification statistics |
 
 ### Other
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/copilot/chat` | AI safety assistant |
-| `POST` | `/api/simulator/what-if` | What-if scenario simulation |
-| `POST` | `/api/cv/detect` | Run PPE detection cycle |
-| `GET` | `/api/cv/violations` | Active PPE violations |
-| `GET` | `/api/knowledge-graph/query` | Natural language graph query |
-| `GET` | `/api/knowledge-graph/patterns` | Root cause patterns |
+
+| Endpoint | Method | Module | Description |
+| :--- | :---: | :--- | :--- |
+| `/api/copilot/chat` | `POST` | Copilot | AI safety assistant chat |
+| `/api/simulator/what-if` | `POST` | Simulator | What-if scenario simulation |
+| `/api/cv/detect` | `POST` | CCTV | Run PPE detection cycle |
+| `/api/cv/violations` | `GET` | CCTV | Active PPE violations |
+| `/api/knowledge-graph/query` | `GET` | KG | Natural language graph query |
+| `/api/knowledge-graph/patterns` | `GET` | KG | Root cause pattern analysis |
 
 ---
 
-## 🔌 Real-time WebSocket Events
+## 💻 Example API Usage
 
-| Event | Direction | Description |
-|-------|-----------|-------------|
-| `sensor_update` | Server → Client | Live sensor readings every 2s |
-| `risk_update` | Server → Client | Zone risk score changes |
-| `alert_new` | Server → Client | New alert notifications |
-| `permit_flagged` | Server → Client | Permit conflict detected |
-| `emergency_triggered` | Server → Client | Emergency activated |
+### Get Overall Plant Risk
 
-**Endpoint:** `ws://localhost:8000/ws`
+```bash
+curl http://localhost:8000/api/risk/plant
+```
+
+**Response:**
+```json
+{
+  "overall_risk_score": 62,
+  "overall_risk_level": "HIGH",
+  "zones": {
+    "ZONE_A": { "risk_score": 62, "risk_level": "HIGH" },
+    "ZONE_B": { "risk_score": 28, "risk_level": "SAFE" },
+    "ZONE_C": { "risk_score": 15, "risk_level": "SAFE" },
+    "ZONE_D": { "risk_score": 22, "risk_level": "SAFE" },
+    "ZONE_E": { "risk_score": 18, "risk_level": "SAFE" },
+    "ZONE_F": { "risk_score": 10, "risk_level": "SAFE" }
+  },
+  "active_alerts": 3,
+  "active_emergency": false
+}
+```
+
+### Run Multi-Agent Compound Risk Analysis
+
+```bash
+curl http://localhost:8000/api/risk/compound/ZONE_A
+```
+
+**Response:**
+```json
+{
+  "zone_id": "ZONE_A",
+  "compound_risk_score": 82,
+  "risk_level": "CRITICAL",
+  "pipeline_results": {
+    "sensor_risk_score": 18,
+    "permit_findings": { "gas_hazard": true, "simops_conflict": false },
+    "worker_findings": { "workers_in_danger": 3, "total_workers": 8 },
+    "prediction": { "trend": "rising", "confidence": 0.75 }
+  },
+  "triggered_rules": [
+    { "rule": "RULE_1", "condition": "Confined space + elevated gas", "contribution": 25 },
+    { "rule": "RULE_6", "condition": "Ventilation offline + confined space", "contribution": 35 }
+  ],
+  "recommendations": [
+    "IMMEDIATE: Evacuate confined space area in Zone A",
+    "ALERT: Restore ventilation before resuming work",
+    "MONITOR: All non-essential personnel should clear Zone A"
+  ]
+}
+```
+
+### Query Incident RAG
+
+```bash
+curl -X POST http://localhost:8000/api/incidents/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What incidents involved gas leaks during confined space maintenance?"
+  }'
+```
+
+### Trigger Emergency Orchestration
+
+```bash
+curl -X POST http://localhost:8000/api/emergency/trigger \
+  -H "Content-Type: application/json" \
+  -d '{
+    "zone_id": "ZONE_A",
+    "severity": "CRITICAL"
+  }'
+```
+
+### Chat with AI Copilot
+
+```bash
+curl -X POST http://localhost:8000/api/copilot/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "What is the current risk in Zone A and what should I do?"
+  }'
+```
+
+### Run What-If Scenario
+
+```bash
+curl -X POST http://localhost:8000/api/simulator/what-if \
+  -H "Content-Type: application/json" \
+  -d '{
+    "zone_id": "ZONE_A",
+    "ventilation_offline": true,
+    "hot_work_active": true,
+    "gas_leak": true
+  }'
+```
 
 ---
 
 ## 🖥 Frontend Pages
 
 | Page | Route | Description |
-|------|-------|-------------|
+| :--- | :--- | :--- |
 | **Landing** | `/` | Animated landing with stats & CTA |
 | **Dashboard** | `/dashboard` | Risk gauge, zone grid, sensor cards, compound risk panel |
-| **Heatmap** | `/heatmap` | Leaflet plant map with risk overlays & workers |
+| **Heatmap** | `/heatmap` | Leaflet plant map with risk overlays & animated workers |
 | **Permits** | `/permits` | Permit table, SIMOPS matrix, conflict alerts |
 | **Incidents** | `/incidents` | RAG query, pattern analysis, prevention intelligence |
-| **Knowledge Graph** | `/knowledge-graph` | NetworkX visualization, incident/regulation queries |
-| **Alerts** | `/alerts` | Alert center with acknowledge/resolve |
-| **Emergency** | `/emergency` | Orchestration timeline, notifications, reports |
-| **CCTV** | `/cctv` | Camera views, PPE violations, detection stats |
+| **Knowledge Graph** | `/knowledge-graph` | NetworkX graph visualization, natural language query |
+| **Alerts** | `/alerts` | Alert center with acknowledge/resolve workflow |
+| **Emergency** | `/emergency` | Orchestration timeline, notifications, incident reports |
+| **CCTV** | `/cctv` | Camera views, PPE violations, detection log & stats |
 | **What-If** | `/what-if` | Scenario simulator with live risk recalculation |
 | **Copilot** | `/copilot` | AI safety assistant chat interface |
+| **Settings** | `/settings` | Platform configuration panel |
+
+---
+
+## 🔌 Real-Time WebSocket Events
+
+| Event | Direction | Payload | Frequency |
+| :--- | :---: | :--- | :--- |
+| `sensor_update` | Server → Client | `{zone_id, sensors: [{id, type, value, unit, status}]}` | Every 2s |
+| `risk_update` | Server → Client | `{zone_id, risk_score, risk_level, triggered_rules}` | On change |
+| `alert_new` | Server → Client | `{alert_id, severity, title, description, zone_id}` | On trigger |
+| `permit_flagged` | Server → Client | `{permit_id, type, zone_id, conflict, severity}` | On detection |
+| `emergency_triggered` | Server → Client | `{zone_id, risk_score, triggered_rules, timestamp}` | On trigger |
+
+**Endpoint:** `ws://localhost:8000/ws`
+
+---
+
+## 🧪 Demo Scenario
+
+The built-in simulator runs a **120-second escalation cycle** demonstrating Vizag prevention:
+
+```
+T+000s — All zones normal                    Risk: 18  🟢 SAFE
+T+030s — Zone A CH4 rises,                   Risk: 35  🟡 CAUTION
+         confined space permit active
+T+060s — Ventilation offline                 Risk: 62  🟠 HIGH
+T+090s — RULE_1 + RULE_6 fire                Risk: 82  🔴 CRITICAL
+         Emergency AUTO-TRIGGERED 🚨
+T+120s — COMPARISON:
+         WITHOUT SentinelAI → Explosion at T+180s (3 fatalities)
+         WITH    SentinelAI → Evacuated at T+90s  (0 fatalities, 90s advance warning)
+```
+
+### Plant Configuration
+
+| Parameter | Value |
+| :--- | :--- |
+| Zones | 6 (Coke Oven, Blast Furnace, Steel Melting, Rolling Mill, Chemical Processing, Raw Material) |
+| Sensors | 48 (CO, H2S, CH4, O2, Temperature, Pressure, Humidity, Vibration) |
+| Permits | 15 (Hot work, confined space, electrical, maintenance, excavation) |
+| Workers | 50 (Operators, Technicians, Supervisors, Welders, Electricians) |
+| Demo cycle | 120 seconds |
 
 ---
 
 ## 📊 Impact & Metrics
 
 | Metric | Value |
-|--------|-------|
+| :--- | :---: |
 | **Advance warning** | 90+ seconds in demo scenario |
 | **False negative reduction** | 40%+ vs single-sensor baselines |
 | **Compound rules** | 7 multi-sensor correlation rules |
 | **Historical incidents** | 20 real Indian industrial cases |
 | **Regulatory frameworks** | 3 (OISD, Factory Act, DGMS) |
-| **Real-time data streams** | 48 sensors, 50 workers, 15 permits |
-| **Notifications channels** | 4 (WhatsApp, SMS, Email, PA System) |
+| **Real-time data streams** | 48 sensors + 50 workers + 15 permits |
+| **Notification channels** | 4 (WhatsApp, SMS, Email, PA System) |
 | **ML prediction horizons** | 30 / 60 / 90 minutes |
-| **Graceful degradation layers** | 3 (DB → LLM → Backend) |
+| **Graceful degradation layers** | 3 (Database → LLM → Backend) |
+| **Frontend pages** | 12 |
+| **API endpoints** | 50+ |
+| **WebSocket events** | 5 |
+
+---
+
+## 🛡️ Graceful Degradation
+
+| Failure | Fallback | Mechanism |
+| :--- | :--- | :--- |
+| PostgreSQL unavailable | SQLite | Auto-switch in SQLAlchemy engine |
+| Redis unavailable | In-memory pub/sub | RedisClient wrapper fallback |
+| Groq LLM unavailable | Rule-based engine | RecommendationAgent templates |
+| ChromaDB unavailable | Keyword search | Similarity fallback over JSON |
+| Backend unavailable | Client-side simulator | 695-line TypeScript fallback |
 
 ---
 
 ## 🏆 Judging Criteria Coverage
 
 | Criteria | Weight | How SentinelAI Addresses It |
-|----------|:------:|-----------------------------|
+| :--- | :---: | :--- |
 | **Innovation** | 25% | Multi-agent LangGraph compound detection, SIMOPS intelligence, RAG + Knowledge Graph fusion |
-| **Business Impact** | 25% | Addresses 6,500+ annual fatalities; real market need validated by FICCI survey; compelling Vizag narrative |
-| **Technical Excellence** | 20% | Full-stack (FastAPI + Next.js), LangGraph agents, ChromaDB RAG, Redis pub/sub, WebSocket real-time, ML predictions, graceful degradation |
+| **Business Impact** | 25% | Addresses 6,500+ annual fatalities; validated by FICCI survey; compelling Vizag narrative |
+| **Technical Excellence** | 20% | Full-stack (FastAPI + Next.js), LangGraph agents, ChromaDB RAG, Redis pub/sub, WebSocket, ML, graceful degradation |
 | **Scalability** | 15% | Containerized (Docker Compose), async FastAPI, PostgreSQL/Redis, stateless REST, WebSocket broadcasting |
-| **User Experience** | 15% | 11-page dark-themed UI, real-time updates, Leaflet heatmap, Recharts, copilot chat, responsive emergency command center |
+| **User Experience** | 15% | 12-page dark-themed UI, real-time updates, Leaflet heatmap, Recharts, Copilot chat, responsive emergency command center |
 
 ---
 
-## 🛡 Graceful Degradation
+## 🏛️ Quick Reference
 
-SentinelAI is built to **never go dark**:
+### Design Principles
 
-| Failure | Fallback |
-|---------|----------|
-| PostgreSQL unavailable | Automatically switches to SQLite |
-| Redis unavailable | In-memory pub/sub fallback |
-| Groq LLM unavailable | Rule-based recommendation engine |
-| Backend unavailable | Frontend runs 695-line client simulator |
+| Principle | Description |
+| :--- | :--- |
+| **Compound Detection** | Correlate multiple data streams — not individual sensor thresholds |
+| **Real-Time First** | WebSocket streaming for all live data; REST for queries |
+| **Graceful Degradation** | Every dependency has a fallback. Never goes dark. |
+| **Separation of Concerns** | 3-layer architecture with defined module boundaries |
+| **Symmetrical Logic** | Risk calculation in both Python (backend) and TypeScript (frontend) |
+| **Regulatory Grounding** | Every permit conflict cites its OISD / Factory Act basis |
+
+### Key Files
+
+| File | Purpose |
+| :--- | :--- |
+| `backend/main.py` | FastAPI server — 11 routers, lifespan, WebSocket |
+| `backend/agents/compound_risk_agent.py` | 6-node LangGraph multi-agent pipeline |
+| `backend/agents/permit_intelligence_agent.py` | 6-rule permit conflict detection engine |
+| `backend/agents/emergency_orchestrator.py` | 6-step emergency response sequence |
+| `backend/agents/incident_rag_agent.py` | ChromaDB RAG query agent |
+| `backend/rag/retriever.py` | LangChain RetrievalQA + Groq LLM |
+| `backend/knowledge_graph/graph.py` | NetworkX MultiDiGraph (461 lines) |
+| `backend/data/simulator.py` | 6-zone simulation engine (598 lines) |
+| `backend/models/predictive_risk.py` | scikit-learn LinearRegression predictor |
+| `backend/cv/ppe_detector.py` | Simulated PPE violation detection |
+| `frontend/src/lib/api.ts` | Unified API client (41 methods, dual-mode) |
+| `frontend/src/lib/simulator.ts` | Client-side fallback simulator (695 lines) |
+
+### Quick Start Commands
+
+```bash
+# Start backend
+cd backend && uvicorn main:app --reload --port 8000
+
+# Start frontend
+cd frontend && npm run dev
+
+# Full stack with Docker
+docker-compose up --build -d
+
+# API docs (when running)
+# http://localhost:8000/docs   → Swagger UI
+# http://localhost:3000        → Frontend
+```
 
 ---
 
 <div align="center">
-  <sub>Built for the 6,500+ workers who deserve to go home safe every day.</sub>
+  <sub>Built for the Economic Times — SentinelAI Hackathon 2025 · <i>"For the 6,500+ workers who deserve to go home safe."</i></sub>
 </div>
